@@ -15,7 +15,7 @@ COPY api/requirements.txt /app/api/requirements.txt
 RUN pip install --no-cache-dir -r /app/api/requirements.txt
 
 COPY api/app /app/api/app
-COPY api/shortcuts.example.yaml /app/api/shortcuts.yaml
+COPY api/shortcuts.example.yaml /app/shortcuts.yaml
 COPY --from=ui-build /src/ui/dist /app/ui/dist
 
 EXPOSE 8000

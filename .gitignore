@@ -9,6 +9,7 @@ api/app/__pycache__/
 .pytest_cache/
 
 # Local config
+shortcuts.yaml
 api/shortcuts.yaml
 
 # Runtime caches

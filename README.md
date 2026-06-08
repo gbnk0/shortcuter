@@ -16,6 +16,12 @@ Ce fichier est volontairement ignore par Git. Pour demarrer depuis un exemple:
 cp api/shortcuts.example.yaml api/shortcuts.yaml
 ```
 
+En Docker, le fichier peut etre monte plus simplement a la racine du conteneur:
+
+```text
+/shortcuts.yaml
+```
+
 Format:
 
 ```yaml
@@ -108,19 +114,19 @@ L'image Docker sert l'API et le build Vue sur le port `8000`.
 ```bash
 docker build -t raccourcis .
 docker run --rm -p 8000:8000 \
-  -v "$PWD/api/shortcuts.yaml:/app/api/shortcuts.yaml:ro" \
+  -v "$PWD/shortcuts.yaml:/shortcuts.yaml:ro" \
   -v raccourcis-icon-cache:/app/api/icon-cache \
   raccourcis
 ```
 
-Un compose d'exemple est fourni:
+Un compose standard est fourni:
 
 ```bash
-cp docker-compose.example.yml docker-compose.yml
+cp api/shortcuts.example.yaml shortcuts.yaml
 docker compose up -d --build
 ```
 
-Sans montage de `api/shortcuts.yaml`, l'image utilise `api/shortcuts.example.yaml` comme configuration par defaut.
+Sans montage de `shortcuts.yaml`, l'image utilise `api/shortcuts.example.yaml` comme configuration par defaut.
 
 ## UI
 

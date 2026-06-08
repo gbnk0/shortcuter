@@ -20,7 +20,11 @@ from pydantic import BaseModel, Field, ValidationError, field_validator
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-SHORTCUTS_PATH = BASE_DIR / "shortcuts.yaml"
+SHORTCUTS_PATHS = (
+    Path("/shortcuts.yaml"),
+    BASE_DIR.parent / "shortcuts.yaml",
+    BASE_DIR / "shortcuts.yaml",
+)
 ICON_CACHE_DIR = BASE_DIR / "icon-cache"
 UI_DIST_DIR = BASE_DIR.parent / "ui" / "dist"
 ICON_CACHE_TTL = 3600
@@ -439,11 +443,19 @@ def shortcut_from_yaml(item: dict, default_page_id: str) -> Shortcut:
     return shortcut
 
 
+def shortcuts_path() -> Path:
+    for path in SHORTCUTS_PATHS:
+        if path.is_file():
+            return path
+    return SHORTCUTS_PATHS[-1]
+
+
 def load_yaml() -> dict:
-    if not SHORTCUTS_PATH.exists():
+    path = shortcuts_path()
+    if not path.is_file():
         return {}
     try:
-        return yaml.safe_load(SHORTCUTS_PATH.read_text(encoding="utf-8")) or {}
+        return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     except yaml.YAMLError as exc:
         raise HTTPException(status_code=500, detail=f"YAML invalide: {exc}") from exc
 
