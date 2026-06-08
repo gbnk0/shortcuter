@@ -2,7 +2,7 @@
   <footer class="app-footer">
     <span>Version {{ version }}</span>
     <button type="button" @click="$emit('toggle-icons-view')">
-      {{ activeView === 'icons' ? 'Retour a la page des raccourcis' : 'Catalogue des icones YAML' }}
+      {{ activeView === 'icons' ? 'Back to shortcuts' : 'YAML icon catalog' }}
     </button>
   </footer>
 </template>

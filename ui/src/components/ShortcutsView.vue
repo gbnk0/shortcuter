@@ -2,13 +2,13 @@
   <template v-if="loading">
     <section class="empty-state">
       <i class="mdi mdi-loading mdi-spin"></i>
-      <span>Chargement</span>
+      <span>Loading</span>
     </section>
   </template>
 
   <Transition name="tab-panel" mode="out-in">
     <div v-if="!loading" :key="activePage" class="tab-panel">
-      <SearchBar v-model="query" placeholder="Rechercher une application" autofocus :focus-key="activePage" />
+      <SearchBar v-model="query" placeholder="Search applications" autofocus :focus-key="activePage" />
 
       <section v-for="group in groups" :key="group.name" class="group-section">
         <h2>{{ group.name }}</h2>
@@ -24,12 +24,12 @@
 
       <section v-if="pageShortcuts.length === 0" class="empty-state">
         <i class="mdi mdi-apps"></i>
-        <span>Aucun raccourci sur cette page</span>
+        <span>No shortcuts on this page</span>
       </section>
 
       <section v-else-if="filteredShortcuts.length === 0" class="empty-state">
         <i class="mdi mdi-magnify-close"></i>
-        <span>Aucun resultat</span>
+        <span>No results</span>
       </section>
     </div>
   </Transition>

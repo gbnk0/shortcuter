@@ -2,12 +2,12 @@ import { computed, ref } from 'vue'
 
 export function useTheme() {
   const theme = ref('light')
-  const themeTitle = computed(() => (theme.value === 'dark' ? 'Theme clair' : 'Theme sombre'))
+  const themeTitle = computed(() => (theme.value === 'dark' ? 'Light theme' : 'Dark theme'))
 
   function applyTheme(nextTheme) {
     theme.value = nextTheme
     document.documentElement.dataset.theme = nextTheme
-    localStorage.setItem('raccourcis-theme', nextTheme)
+    localStorage.setItem('shortcuter-theme', nextTheme)
   }
 
   function toggleTheme() {
@@ -15,7 +15,7 @@ export function useTheme() {
   }
 
   function initialTheme() {
-    const savedTheme = localStorage.getItem('raccourcis-theme')
+    const savedTheme = localStorage.getItem('shortcuter-theme')
     if (savedTheme === 'dark' || savedTheme === 'light') {
       return savedTheme
     }
@@ -33,4 +33,3 @@ export function useTheme() {
     toggleTheme,
   }
 }
-

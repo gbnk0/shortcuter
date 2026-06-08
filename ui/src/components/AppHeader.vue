@@ -6,7 +6,7 @@
       <p>{{ subtitle }}</p>
     </div>
     <div class="top-actions">
-      <div class="view-tabs" role="tablist" aria-label="Vues">
+      <div class="view-tabs" role="tablist" aria-label="Views">
         <button
           v-for="item in pages"
           :key="item.id"

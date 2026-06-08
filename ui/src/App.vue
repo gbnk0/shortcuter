@@ -56,7 +56,7 @@ const error = ref('')
 const searchQuery = ref('')
 const iconSearchQuery = ref('')
 const page = ref({
-  title: 'Raccourcis',
+  title: 'Shortcuter',
   subtitle: '',
   rubrique: 'General',
   accent: 'green',
@@ -96,7 +96,7 @@ const navigationPages = computed(() => {
   return [
     {
       id: '__all',
-      title: 'Tous',
+      title: 'All',
       subtitle: '',
       rubrique: page.value.rubrique,
       accent: page.value.all_tab_accent || page.value.accent,
@@ -109,9 +109,9 @@ const navigationPages = computed(() => {
 const currentPage = computed(() => {
   if (activeView.value === 'icons') {
     return {
-      title: 'Catalogue des icones',
-      subtitle: 'Noms utilisables dans le YAML',
-      rubrique: 'Catalogue',
+      title: 'Icon Catalog',
+      subtitle: 'Names available for YAML',
+      rubrique: 'Catalog',
       accent: page.value.accent || '#16807a',
     }
   }
@@ -141,7 +141,7 @@ function apiError(err) {
   if (Array.isArray(detail)) {
     return detail.map((item) => item.msg).join(', ')
   }
-  return detail || err.message || 'Erreur inconnue'
+  return detail || err.message || 'Unknown error'
 }
 
 async function loadShortcuts() {

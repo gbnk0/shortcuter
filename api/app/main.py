@@ -36,7 +36,7 @@ BUILTIN_ICON_DOWNLOAD_CONCURRENCY = 12
 ICON_EXTENSIONS = (".svg", ".png", ".webp", ".ico", ".jpg", ".jpeg", ".gif")
 ICON_CACHE: dict[str, tuple[float, str]] = {}
 BUILTIN_ICON_CACHE: tuple[float, list[dict[str, str]]] | None = None
-LOGGER = logging.getLogger("raccourcis")
+LOGGER = logging.getLogger("shortcuter")
 
 
 class IconLinkParser(HTMLParser):
@@ -84,13 +84,13 @@ class Shortcut(BaseModel):
     def normalize_url(cls, value: str) -> str:
         value = value.strip()
         if not value:
-            raise ValueError("URL obligatoire")
+            raise ValueError("URL is required")
         parsed = urlparse(value)
         if not parsed.scheme:
             value = f"https://{value}"
             parsed = urlparse(value)
         if parsed.scheme not in {"http", "https"} or not parsed.netloc:
-            raise ValueError("URL http/https invalide")
+            raise ValueError("Invalid HTTP/HTTPS URL")
         return value
 
 
@@ -104,7 +104,7 @@ class ShortcutPage(BaseModel):
 
 
 class PageConfig(BaseModel):
-    title: str = "Raccourcis"
+    title: str = "Shortcuter"
     subtitle: str = ""
     rubrique: str = "General"
     accent: str = "green"
@@ -227,7 +227,7 @@ async def detect_icon(url: str) -> str:
     parser = IconLinkParser()
     manifest_icons: list[dict[str, str]] = []
     headers = {
-        "User-Agent": "Mozilla/5.0 raccourcis-icon-detector/1.0",
+        "User-Agent": "Mozilla/5.0 shortcuter-icon-detector/1.0",
         "Accept": "text/html,application/xhtml+xml",
     }
 
@@ -274,7 +274,7 @@ async def cache_icon_asset(icon_url: str) -> str | None:
             response = await client.get(
                 icon_url,
                 headers={
-                    "User-Agent": "Mozilla/5.0 raccourcis-icon-cache/1.0",
+                    "User-Agent": "Mozilla/5.0 shortcuter-icon-cache/1.0",
                     "Accept": "image/*,*/*",
                 },
             )
@@ -457,15 +457,15 @@ def load_yaml() -> dict:
     try:
         return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     except yaml.YAMLError as exc:
-        raise HTTPException(status_code=500, detail=f"YAML invalide: {exc}") from exc
+        raise HTTPException(status_code=500, detail=f"Invalid YAML: {exc}") from exc
 
 
 def load_page(content: dict) -> PageConfig:
     raw_page = content.get("general") or {}
     if raw_page and not isinstance(raw_page, dict):
-        raise HTTPException(status_code=500, detail="Le champ YAML 'general' doit etre un objet")
+        raise HTTPException(status_code=500, detail="YAML field 'general' must be an object")
     return PageConfig(
-        title=str(raw_page.get("title") or "Raccourcis"),
+        title=str(raw_page.get("title") or "Shortcuter"),
         subtitle=str(raw_page.get("subtitle") or ""),
         rubrique=str(raw_page.get("rubrique") or "General"),
         accent=str(raw_page.get("accent") or "green"),
@@ -501,25 +501,25 @@ def load_pages(content: dict, default_page: PageConfig) -> list[dict]:
             }
         ]
     if not isinstance(raw_pages, list):
-        raise HTTPException(status_code=500, detail="Le champ YAML 'pages' doit etre une liste")
+        raise HTTPException(status_code=500, detail="YAML field 'pages' must be a list")
 
     pages = []
     for index, item in enumerate(raw_pages):
         if not isinstance(item, dict):
-            raise HTTPException(status_code=500, detail=f"Page #{index + 1} invalide")
+            raise HTTPException(status_code=500, detail=f"Page #{index + 1} is invalid")
         page = shortcut_page_from_yaml(index, item, default_page)
         raw_shortcuts = item.get("shortcuts") or []
         if not isinstance(raw_shortcuts, list):
-            raise HTTPException(status_code=500, detail=f"Le champ YAML 'pages[{index}].shortcuts' doit etre une liste")
+            raise HTTPException(status_code=500, detail=f"YAML field 'pages[{index}].shortcuts' must be a list")
         for shortcut_index, shortcut_item in enumerate(raw_shortcuts):
             if not isinstance(shortcut_item, dict):
-                raise HTTPException(status_code=500, detail=f"Raccourci #{shortcut_index + 1} de la page {page['id']} invalide")
+                raise HTTPException(status_code=500, detail=f"Shortcut #{shortcut_index + 1} on page {page['id']} is invalid")
             try:
                 page["shortcuts"].append(shortcut_from_yaml(shortcut_item, page["id"]))
             except (ValueError, ValidationError) as exc:
                 raise HTTPException(
                     status_code=500,
-                    detail=f"Raccourci #{shortcut_index + 1} de la page {page['id']}: {exc}",
+                    detail=f"Shortcut #{shortcut_index + 1} on page {page['id']}: {exc}",
                 ) from exc
         pages.append(page)
     return pages or load_pages({}, default_page)
@@ -544,9 +544,9 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Raccourcis API",
+    title="Shortcuter API",
     version="1.0.0",
-    description="API de lecture des raccourcis depuis un fichier YAML.",
+    description="Read-only shortcuts API backed by a YAML file.",
     lifespan=lifespan,
 )
 
@@ -580,7 +580,7 @@ async def health() -> dict[str, str]:
 async def cached_icon(filename: str) -> FileResponse:
     path = ICON_CACHE_DIR / filename
     if path.parent != ICON_CACHE_DIR or not path.exists():
-        raise HTTPException(status_code=404, detail="Icone introuvable")
+        raise HTTPException(status_code=404, detail="Icon not found")
     return FileResponse(path)
 
 
@@ -610,7 +610,7 @@ if UI_DIST_DIR.exists():
 def ui_index() -> HTMLResponse:
     index_path = UI_DIST_DIR / "index.html"
     if not index_path.exists():
-        raise HTTPException(status_code=404, detail="UI build introuvable")
+        raise HTTPException(status_code=404, detail="UI build not found")
     return HTMLResponse(index_path.read_text(encoding="utf-8"))
 
 
@@ -622,5 +622,5 @@ async def serve_ui_root() -> HTMLResponse:
 @app.get("/{path:path}", response_class=HTMLResponse)
 async def serve_ui_path(path: str) -> HTMLResponse:
     if "." in Path(path).name:
-        raise HTTPException(status_code=404, detail="Fichier introuvable")
+        raise HTTPException(status_code=404, detail="File not found")
     return ui_index()
