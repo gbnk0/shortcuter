@@ -1,0 +1,21 @@
+.DS_Store
+*.local
+*.log
+
+# Python
+api/.venv/
+api/__pycache__/
+api/app/__pycache__/
+.pytest_cache/
+
+# Local config
+api/shortcuts.yaml
+
+# Runtime caches
+api/icon-cache/
+
+# Node / Vite
+ui/node_modules/
+ui/dist/
+ui/.vite/
+npm-debug.log*

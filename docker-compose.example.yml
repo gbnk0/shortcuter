@@ -1,0 +1,13 @@
+services:
+  raccourcis:
+    build: .
+    container_name: raccourcis
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./api/shortcuts.yaml:/app/api/shortcuts.yaml:ro
+      - icon-cache:/app/api/icon-cache
+    restart: unless-stopped
+
+volumes:
+  icon-cache:

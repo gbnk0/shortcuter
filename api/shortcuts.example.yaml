@@ -1,0 +1,340 @@
+general:
+  title: Raccourcis
+  subtitle: Applications et services internes
+  rubrique: Liens
+  accent: green
+  download-icons: true
+  show_all_tab: true
+  all_tab_accent: slate
+
+pages:
+  - title: General
+    subtitle: Acces rapides du quotidien
+    rubrique: Accueil
+    accent: green
+    shortcuts:
+      - name: Documentation
+        url: https://docs.example.lan
+        group: Ressources
+        description: Documentation interne et procedures
+        icon: homarr/bookstack
+        badge:
+          icon: mdi-hammer-wrench
+          tooltip: Migration de contenu en cours
+
+      - name: Wiki
+        url: https://wiki.example.lan
+        group: Ressources
+        description: Notes d'equipe et connaissances partagees
+        icon: homarr/hedgedoc
+
+      - name: Liens sauvegardes
+        url: https://links.example.lan
+        group: Ressources
+        description: Favoris et veille technique
+        icon: homarr/linkwarden
+
+      - name: Boite a outils
+        url: https://tools.example.lan
+        group: Outils
+        description: Convertisseurs, generateurs et diagnostics
+        icon: homarr/it-tools
+
+      - name: PDF Tools
+        url: https://pdf.example.lan
+        group: Outils
+        description: Manipulation et conversion PDF
+        icon: homarr/stirling-pdf
+
+      - name: Fichiers
+        url: https://files.example.lan
+        group: Outils
+        description: Explorateur de fichiers web
+        icon: homarr/filebrowser
+
+  - title: Monitoring
+    subtitle: Supervision, logs et metriques
+    rubrique: Observabilite
+    accent: blue
+    shortcuts:
+      - name: Checkmk
+        url: https://monitoring.example.lan
+        group: Supervision
+        description: Etat des hosts et alertes
+        icon: homarr/checkmk
+
+      - name: Uptime Kuma
+        url: https://uptime.example.lan
+        group: Supervision
+        description: Supervision HTTP, TCP et certificats
+        icon: homarr/uptime-kuma
+
+      - name: Grafana
+        url: https://grafana.example.lan
+        group: Metriques
+        description: Dashboards et tendances
+        icon: homarr/grafana
+
+      - name: Prometheus
+        url: https://prometheus.example.lan
+        group: Metriques
+        description: Requetes PromQL et targets
+        icon: homarr/prometheus
+
+      - name: Alertmanager
+        url: https://alertmanager.example.lan
+        group: Alertes
+        description: Routage et silence des alertes
+        icon: homarr/alertmanager
+
+      - name: Kibana
+        url: https://kibana.example.lan
+        group: Logs
+        description: Recherche et tableaux de bord logs
+        icon: homarr/kibana
+
+  - title: Infra
+    subtitle: Hyperviseurs, conteneurs et CI
+    rubrique: Exploitation
+    accent: orange
+    shortcuts:
+      - name: Proxmox
+        url: https://proxmox.example.lan
+        group: Virtualisation
+        description: Clusters, VM et backups
+        icon: homarr/proxmox
+
+      - name: Portainer
+        url: https://portainer.example.lan
+        group: Conteneurs
+        description: Gestion Docker et stacks Compose
+        icon: homarr/portainer
+
+      - name: Registry
+        url: https://registry.example.lan
+        group: Conteneurs
+        description: Registre d'images applicatives
+        icon: homarr/docker
+
+      - name: Traefik
+        url: https://traefik.example.lan
+        group: Reverse proxy
+        description: Routes, middlewares et certificats
+        icon: homarr/traefik
+
+      - name: GitLab
+        url: https://gitlab.example.lan
+        group: DevOps
+        description: Repositories, CI et releases
+        icon: homarr/gitlab
+
+      - name: Renovate
+        url: https://renovate.example.lan
+        group: DevOps
+        description: Suivi des mises a jour applicatives
+        icon: homarr/renovate
+
+      - name: Code Server
+        url: https://code.example.lan
+        group: DevOps
+        description: IDE web pour interventions rapides
+        icon: homarr/code-server
+
+  - title: Reseau
+    subtitle: DNS, VPN, securite et acces
+    rubrique: Reseau
+    accent: cyan
+    shortcuts:
+      - name: OPNsense
+        url: https://firewall.example.lan
+        group: Firewall
+        description: Regles, NAT et interfaces
+        icon: homarr/opnsense
+
+      - name: AdGuard Home
+        url: https://dns.example.lan
+        group: DNS
+        description: Filtrage DNS et statistiques
+        icon: homarr/adguard-home
+
+      - name: Pi-hole
+        url: https://pihole.example.lan
+        group: DNS
+        description: DNS secondaire et blocage publicitaire
+        icon: homarr/pi-hole
+
+      - name: NetBox
+        url: https://netbox.example.lan
+        group: Inventaire
+        description: IPAM, racks et equipements
+        icon: homarr/netbox
+
+      - name: WireGuard
+        url: https://vpn.example.lan
+        group: Acces distant
+        description: Pairs VPN et tunnels
+        icon: homarr/wireguard
+
+      - name: Nginx Proxy Manager
+        url: https://proxy.example.lan
+        group: Reverse proxy
+        description: Hosts, redirections et certificats
+        icon: homarr/nginx-proxy-manager
+
+      - name: CrowdSec
+        url: https://crowdsec.example.lan
+        group: Securite
+        description: Evenements, decisions et remediation
+        icon: homarr/crowdsec
+
+  - title: Donnees
+    subtitle: Stockage, bases et documents
+    rubrique: Data
+    accent: purple
+    shortcuts:
+      - name: Nextcloud
+        url: https://cloud.example.lan
+        group: Fichiers
+        description: Synchronisation et partage de fichiers
+        icon: homarr/nextcloud
+
+      - name: Paperless
+        url: https://paperless.example.lan
+        group: Documents
+        description: Archivage et OCR des documents
+        icon: homarr/paperless-ngx
+
+      - name: Syncthing
+        url: https://sync.example.lan
+        group: Fichiers
+        description: Synchronisation poste a poste
+        icon: homarr/syncthing
+
+      - name: MinIO
+        url: https://s3.example.lan
+        group: Stockage objet
+        description: Buckets S3 et acces applicatifs
+        icon: homarr/minio
+
+      - name: PostgreSQL
+        url: https://postgres.example.lan
+        group: Bases
+        description: Administration PostgreSQL
+        icon: homarr/postgres
+
+      - name: Redis
+        url: https://redis.example.lan
+        group: Bases
+        description: Cache et files applicatives
+        icon: homarr/redis
+
+      - name: phpMyAdmin
+        url: https://mysql.example.lan
+        group: Bases
+        description: Administration MySQL/MariaDB
+        icon: homarr/phpmyadmin
+
+  - title: Automatisation
+    subtitle: Domotique, workflows et identite
+    rubrique: Services
+    accent: yellow
+    shortcuts:
+      - name: Home Assistant
+        url: https://homeassistant.example.lan
+        group: Domotique
+        description: Automatisation maison et tableaux de bord
+        icon: homarr/home-assistant
+
+      - name: Node-RED
+        url: https://nodered.example.lan
+        group: Workflows
+        description: Flux d'automatisation et integrations
+        icon: homarr/node-red
+
+      - name: Zigbee2MQTT
+        url: https://zigbee.example.lan
+        group: Domotique
+        description: Passerelle Zigbee et objets connectes
+        icon: homarr/zigbee2mqtt
+
+      - name: ESPHome
+        url: https://esphome.example.lan
+        group: Domotique
+        description: Firmwares et devices ESP
+        icon: homarr/esphome
+
+      - name: Vaultwarden
+        url: https://vault.example.lan
+        group: Identite
+        description: Coffre de mots de passe
+        icon: homarr/vaultwarden
+
+      - name: Authentik
+        url: https://auth.example.lan
+        group: Identite
+        description: SSO, OAuth et politiques d'acces
+        icon: homarr/authentik
+
+  - title: Medias
+    subtitle: Photos, streaming et indexation
+    rubrique: Medias
+    accent: pink
+    shortcuts:
+      - name: Immich
+        url: https://photos.example.lan
+        group: Photos
+        description: Sauvegarde et galerie photos
+        icon: homarr/immich
+
+      - name: Jellyfin
+        url: https://jellyfin.example.lan
+        group: Streaming
+        description: Bibliotheque video et audio
+        icon: homarr/jellyfin
+
+      - name: Plex
+        url: https://plex.example.lan
+        group: Streaming
+        description: Media server familial
+        icon: homarr/plex
+
+      - name: Sonarr
+        url: https://sonarr.example.lan
+        group: Indexation
+        description: Series et calendrier de sorties
+        icon: homarr/sonarr
+
+      - name: Radarr
+        url: https://radarr.example.lan
+        group: Indexation
+        description: Films et profils qualite
+        icon: homarr/radarr
+
+      - name: Prowlarr
+        url: https://prowlarr.example.lan
+        group: Indexation
+        description: Indexeurs et synchronisation
+        icon: homarr/prowlarr
+
+      - name: Bazarr
+        url: https://bazarr.example.lan
+        group: Indexation
+        description: Sous-titres et langues
+        icon: homarr/bazarr
+
+  - title: Finance
+    subtitle: Budget personnel et suivi applicatif
+    rubrique: Gestion
+    accent: red
+    shortcuts:
+      - name: Actual Budget
+        url: https://budget.example.lan
+        group: Budget
+        description: Comptes, enveloppes et previsions
+        icon: homarr/actual-budget
+
+      - name: Firefly III
+        url: https://firefly.example.lan
+        group: Budget
+        description: Suivi des depenses et rapports
+        icon: homarr/firefly-iii

@@ -1,0 +1,522 @@
+:root {
+  --accent: #16803f;
+  --accent-hover: #0f6831;
+  --background: #f4f6f8;
+  --border: #d9e1ea;
+  --border-strong: #cbd5e1;
+  --card: #ffffff;
+  --card-muted: #e9eef1;
+  --danger-bg: #fff0f1;
+  --danger-border: #e6a2a9;
+  --danger-text: #8b1f2b;
+  --shadow: rgba(23, 36, 52, 0.1);
+  --text: #18212f;
+  --text-muted: #657286;
+  --text-soft: #526072;
+  color: var(--text);
+  background: var(--background);
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 16px;
+}
+
+:root[data-theme="dark"] {
+  --accent: #55c878;
+  --accent-hover: #84dfa0;
+  --background: #111827;
+  --border: #2a3548;
+  --border-strong: #3a475c;
+  --card: #172033;
+  --card-muted: #223047;
+  --danger-bg: #341b22;
+  --danger-border: #7f3a45;
+  --danger-text: #ffb3bd;
+  --shadow: rgba(0, 0, 0, 0.28);
+  --text: #edf3fb;
+  --text-muted: #a8b3c4;
+  --text-soft: #bdc6d4;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: var(--background);
+}
+
+#app {
+  min-height: 100vh;
+}
+
+button {
+  cursor: pointer;
+  font: inherit;
+}
+
+input {
+  font: inherit;
+}
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 28px 0 40px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3rem);
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.rubrique {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.topbar p {
+  margin: 8px 0 0;
+  color: var(--text-muted);
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  min-width: 42px;
+  min-height: 42px;
+  border: 1px solid var(--border-strong);
+  border-radius: 7px;
+  background: var(--card);
+  color: var(--text);
+}
+
+.icon-button:hover {
+  background: var(--card-muted);
+}
+
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.view-tabs {
+  display: inline-flex;
+  gap: 4px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--card);
+  padding: 4px;
+}
+
+.view-tabs button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 34px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  padding: 0 10px;
+}
+
+.view-tabs button.active {
+  background: var(--tab-accent-soft);
+  color: var(--tab-accent);
+  box-shadow: inset 0 0 0 1px var(--tab-accent);
+}
+
+.search-band {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) 34px;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--text-muted);
+  padding: 0 12px;
+}
+
+.search-band:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.tab-panel {
+  will-change: opacity, transform;
+}
+
+.tab-panel-enter-active,
+.tab-panel-leave-active {
+  transition:
+    opacity 0.16s ease,
+    transform 0.16s ease;
+}
+
+.tab-panel-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.tab-panel-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+.search-band input {
+  min-width: 0;
+  height: 46px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+}
+
+.search-band input::placeholder {
+  color: var(--text-muted);
+}
+
+.clear-search {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.clear-search:hover {
+  background: var(--card-muted);
+  color: var(--text);
+}
+
+.group-section {
+  margin-top: 28px;
+}
+
+.group-section h2 {
+  margin: 0 0 12px;
+  color: var(--text-soft);
+  font-size: 0.92rem;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.shortcuts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.shortcut-card {
+  min-height: 88px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.shortcut-card:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--card) 94%, var(--accent) 6%);
+  box-shadow: 0 8px 22px var(--shadow);
+}
+
+.shortcut-link {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 24px;
+  align-items: center;
+  gap: 12px;
+  min-height: 88px;
+  min-width: 0;
+  padding: 12px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.shortcut-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background: var(--card-muted);
+  color: var(--accent);
+  font-size: 1.75rem;
+}
+
+.shortcut-icon img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+
+.shortcut-badge {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--card);
+  border-radius: 999px;
+  background: #f6c343;
+  color: #2f2500;
+  font-size: 0.74rem;
+  line-height: 1;
+}
+
+.shortcut-text {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+}
+
+.shortcut-text strong,
+.shortcut-description {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shortcut-text strong {
+  font-size: 1rem;
+}
+
+.shortcut-description {
+  --scroll-distance: 0px;
+  display: block;
+  color: var(--text-muted);
+}
+
+.shortcut-description span {
+  display: inline-block;
+  min-width: 0;
+  transform: translateX(0);
+}
+
+.shortcut-card:hover .shortcut-description.scrollable span {
+  animation: description-marquee 2.4s ease-in-out 0.15s infinite alternate;
+}
+
+@keyframes description-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(var(--scroll-distance));
+  }
+}
+
+.open-icon {
+  color: var(--text-muted);
+  opacity: 0;
+  transition:
+    color 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.shortcut-card:hover .open-icon,
+.shortcut-card:focus-within .open-icon {
+  color: var(--accent);
+  opacity: 1;
+}
+
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 160px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 8px;
+  color: var(--text-muted);
+}
+
+.empty-state i {
+  font-size: 1.6rem;
+}
+
+.error-message {
+  margin: 16px 0 0;
+  border: 1px solid var(--danger-border);
+  border-radius: 8px;
+  background: var(--danger-bg);
+  color: var(--danger-text);
+  padding: 12px 14px;
+}
+
+.builtin-icons-view {
+  display: grid;
+  gap: 16px;
+}
+
+.builtin-icons-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.builtin-icons-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  letter-spacing: 0;
+}
+
+.builtin-icons-header span {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.builtin-icons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+}
+
+.builtin-icon-card {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  padding: 16px 10px;
+  text-align: center;
+}
+
+.builtin-icon-preview {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  background: var(--card-muted);
+}
+
+.builtin-icon-preview img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+}
+
+.builtin-icon-card strong,
+.builtin-icon-card small {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.builtin-icon-card strong {
+  color: var(--text);
+  text-transform: capitalize;
+}
+
+.builtin-icon-card small {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.app-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 36px;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+.app-footer button {
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  padding: 0;
+}
+
+.app-footer button:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    width: min(100% - 20px, 1180px);
+    padding-top: 18px;
+  }
+
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .top-actions {
+    width: 100%;
+  }
+
+  .view-tabs {
+    flex: 1 1 100%;
+  }
+
+  .view-tabs button {
+    flex: 1;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab-panel,
+  .tab-panel-enter-active,
+  .tab-panel-leave-active {
+    transition: none;
+    transform: none;
+  }
+
+  .shortcut-card:hover .shortcut-description.scrollable span {
+    animation: none;
+  }
+}

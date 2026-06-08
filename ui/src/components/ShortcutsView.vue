@@ -1,0 +1,92 @@
+<template>
+  <template v-if="loading">
+    <section class="empty-state">
+      <i class="mdi mdi-loading mdi-spin"></i>
+      <span>Chargement</span>
+    </section>
+  </template>
+
+  <Transition name="tab-panel" mode="out-in">
+    <div v-if="!loading" :key="activePage" class="tab-panel">
+      <SearchBar v-model="query" placeholder="Rechercher une application" autofocus :focus-key="activePage" />
+
+      <section v-for="group in groups" :key="group.name" class="group-section">
+        <h2>{{ group.name }}</h2>
+        <div class="shortcuts-grid">
+          <ShortcutCard
+            v-for="shortcut in group.items"
+            :key="shortcut.id"
+            :builtin-icons="builtinIcons"
+            :shortcut="shortcut"
+          />
+        </div>
+      </section>
+
+      <section v-if="pageShortcuts.length === 0" class="empty-state">
+        <i class="mdi mdi-apps"></i>
+        <span>Aucun raccourci sur cette page</span>
+      </section>
+
+      <section v-else-if="filteredShortcuts.length === 0" class="empty-state">
+        <i class="mdi mdi-magnify-close"></i>
+        <span>Aucun resultat</span>
+      </section>
+    </div>
+  </Transition>
+</template>
+
+<script setup>
+import { computed } from 'vue'
+import SearchBar from './SearchBar.vue'
+import ShortcutCard from './ShortcutCard.vue'
+import { groupShortcuts } from '../utils/shortcuts'
+
+const props = defineProps({
+  activePage: {
+    type: String,
+    required: true,
+  },
+  builtinIcons: {
+    type: Array,
+    default: () => [],
+  },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
+  pageShortcuts: {
+    type: Array,
+    default: () => [],
+  },
+  searchQuery: {
+    type: String,
+    default: '',
+  },
+})
+
+const emit = defineEmits(['update:searchQuery'])
+
+const query = computed({
+  get: () => props.searchQuery,
+  set: (value) => emit('update:searchQuery', value),
+})
+
+const filteredShortcuts = computed(() => {
+  const search = query.value.trim().toLowerCase()
+  if (!search) {
+    return props.pageShortcuts
+  }
+  return props.pageShortcuts.filter((shortcut) => {
+    return [
+      shortcut.name,
+      shortcut.description,
+      shortcut.group,
+      shortcut.url,
+    ]
+      .filter(Boolean)
+      .some((value) => value.toLowerCase().includes(search))
+  })
+})
+
+const groups = computed(() => groupShortcuts(filteredShortcuts.value))
+</script>

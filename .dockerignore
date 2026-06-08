@@ -1,0 +1,14 @@
+.DS_Store
+.git
+.gitignore
+
+api/.venv
+api/__pycache__
+api/app/__pycache__
+api/icon-cache
+api/shortcuts.yaml
+
+ui/node_modules
+ui/dist
+ui/.vite
+npm-debug.log*
