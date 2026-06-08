@@ -114,7 +114,7 @@ L'image Docker sert l'API et le build Vue sur le port `8000`.
 ```bash
 docker build -t raccourcis .
 docker run --rm -p 8000:8000 \
-  -v "$PWD/shortcuts.yaml:/shortcuts.yaml:ro" \
+  -v "$PWD/api/shortcuts.example.yaml:/shortcuts.yaml:ro" \
   -v raccourcis-icon-cache:/app/api/icon-cache \
   raccourcis
 ```
@@ -122,11 +122,17 @@ docker run --rm -p 8000:8000 \
 Un compose standard est fourni:
 
 ```bash
-cp api/shortcuts.example.yaml shortcuts.yaml
 docker compose up -d --build
 ```
 
-Sans montage de `shortcuts.yaml`, l'image utilise `api/shortcuts.example.yaml` comme configuration par defaut.
+Par defaut, `compose.yml` monte `api/shortcuts.example.yaml` pour que le projet demarre directement apres clone.
+Pour utiliser une configuration locale privee, copier l'exemple puis remplacer le volume dans `compose.yml` par la ligne commentee:
+
+```bash
+cp api/shortcuts.example.yaml shortcuts.yaml
+```
+
+Sans montage de `/shortcuts.yaml`, l'image utilise aussi `api/shortcuts.example.yaml` comme configuration par defaut.
 
 ## UI
 
