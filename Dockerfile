@@ -1,9 +1,10 @@
 FROM node:22-alpine AS ui-build
 WORKDIR /src/ui
+ARG VITE_APP_VERSION=dev
 COPY ui/package*.json ./
 RUN npm ci
 COPY ui/ ./
-RUN npm run build
+RUN VITE_APP_VERSION=$VITE_APP_VERSION npm run build
 
 FROM python:3.13-slim AS runtime
 WORKDIR /app
