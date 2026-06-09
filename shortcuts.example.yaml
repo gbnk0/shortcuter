@@ -53,7 +53,7 @@ pages:
         description: Web file explorer
         icon: homarr/filebrowser
 
-  - title: Monitoring
+  - title: Ops
     subtitle: Monitoring, logs, and metrics
     rubrique: Observability
     accent: blue
@@ -210,6 +210,12 @@ pages:
         group: Files
         description: Peer-to-peer synchronization
         icon: homarr/syncthing
+
+      - name: Grafana
+        url: https://grafana-data.example.lan
+        group: Metrics
+        description: Data platform dashboards and trends
+        icon: homarr/grafana
 
       - name: MinIO
         url: https://s3.example.lan
