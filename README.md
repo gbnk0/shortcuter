@@ -1,28 +1,39 @@
 # Shortcuter
 
-Read-only Vue.js + FastAPI app for displaying shortcuts defined in YAML.
+Read-only shortcuts dashboard backed by a YAML file. The Docker image serves both the FastAPI backend and the Vue frontend.
 
-## YAML
-
-Edit shortcuts in:
-
-```text
-api/shortcuts.yaml
-```
-
-This file is intentionally ignored by Git. To start from the bundled example:
+## Quick Start
 
 ```bash
-cp api/shortcuts.example.yaml api/shortcuts.yaml
+docker compose up -d --build
 ```
 
-With Docker, the file can also be mounted at the container root:
+Open:
 
 ```text
-/shortcuts.yaml
+http://localhost:8000
 ```
 
-Format:
+By default, Compose runs with the bundled `shortcuts.example.yaml`.
+
+## Configure
+
+Create your private local config:
+
+```bash
+cp shortcuts.example.yaml shortcuts.yaml
+```
+
+Then edit `docker-compose.yml` and switch the mounted file:
+
+```yaml
+volumes:
+  - ./shortcuts.yaml:/shortcuts.yaml:ro
+```
+
+`shortcuts.yaml` is ignored by Git.
+
+Minimal YAML:
 
 ```yaml
 general:
@@ -30,9 +41,7 @@ general:
   subtitle: Internal apps and services
   rubrique: Links
   accent: green
-  download-icons: true
   show_all_tab: true
-  all_tab_accent: slate
 
 pages:
   - title: General
@@ -45,22 +54,16 @@ pages:
         group: Monitoring
         description: Dashboards and metrics
         icon: homarr/kibana
-
-  - title: Infrastructure
-    subtitle: Infrastructure services
-    rubrique: Operations
-    accent: blue
-    shortcuts: []
 ```
 
-`icon` accepts:
+Icon values can be:
 
-- `auto` or a missing field: automatic detection through HTML/manifest, with `https://host/favicon.ico` as fallback;
-- a Material Design Icons class, for example `mdi-server`;
-- a live Homarr Labs icon, for example `homarr/kibana`;
-- an image URL, for example `https://assets.example.lan/icon.png`.
+- `auto`
+- a Material Design Icons class, such as `mdi-server`
+- a Homarr Labs icon, such as `homarr/kibana`
+- an image URL
 
-A shortcut can display a small overlaid badge with a tooltip:
+Optional shortcut badge:
 
 ```yaml
 badge:
@@ -68,105 +71,37 @@ badge:
   tooltip: Maintenance in progress
 ```
 
-Do not define `id` values in YAML: the API generates stable IDs for pages and shortcuts.
+## Local Development
 
-Shortcuts are defined directly in `pages[].shortcuts`.
-
-`accent` accepts a named color: `green`, `blue`, `orange`, `purple`, `pink`, `red`, `cyan`, `yellow`, `slate`. Hex values such as `#16807a` are also accepted.
-
-In `auto` mode, the API ignores TLS certificate validation while fetching icons, selects the largest declared size, then stores the image in `api/icon-cache`. The frontend uses the local icon served by the API instead of fetching it on every page load.
-
-With `general.download-icons: true`, the API downloads configured Homarr Labs icons into the local `api/icon-cache` at startup. HTTP startup is not blocked by the download; icons switch to `/icons/...` as the cache is populated.
-
-With `general.show_all_tab: true`, the UI adds an `All` tab that displays shortcuts from every page.
-
-`general.all_tab_accent` sets the `All` tab color. If omitted, it falls back to `general.accent`.
-
-## API
+API:
 
 ```bash
-cd raccourcis/api
+cd api
 python3.13 -m venv .venv
 . .venv/bin/activate
 pip install -r requirements.txt
 uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-The project uses pinned FastAPI/Pydantic versions from `requirements.txt`.
-On macOS with Homebrew, use `python3.13`: Python 3.14 is too recent for these dependencies.
-
-Endpoints:
-
-- `GET /health`
-- `GET /shortcuts`
-- `GET /builtin-icons`
-
-UI routes:
-
-- `/page/<generated-id>` for a shortcuts page;
-- `/icons` for available icons.
-
-## Docker
-
-The Docker image serves both the API and the Vue build on port `8000`.
+UI:
 
 ```bash
-docker build -t shortcuter .
-docker run --rm -p 8000:8000 \
-  -v "$PWD/api/shortcuts.example.yaml:/shortcuts.yaml:ro" \
-  -v shortcuter-icon-cache:/app/api/icon-cache \
-  shortcuter
+cd ui
+npm install
+VITE_API_URL=http://localhost:8000 npm run dev -- --host 0.0.0.0 --port 5173
 ```
 
-A standard Compose file is provided:
+Open `http://localhost:5173`.
 
-```bash
-docker compose up -d --build
-```
+## Docker Hub Publishing
 
-By default, `docker-compose.yml` mounts `api/shortcuts.example.yaml` so the project starts immediately after cloning.
-To use a private local configuration, copy the example and replace the volume in `docker-compose.yml` with the commented line:
+GitHub Actions publishes the image to Docker Hub on pushes to `main`, on `v*` tags, and from manual workflow runs.
 
-```bash
-cp api/shortcuts.example.yaml shortcuts.yaml
-```
-
-Without a `/shortcuts.yaml` mount, the image also uses `api/shortcuts.example.yaml` as its default configuration.
-
-### Publish to Docker Hub
-
-The repository includes a GitHub Actions workflow that builds and pushes the image to Docker Hub.
-
-Create these repository secrets in GitHub:
+Required GitHub repository secrets:
 
 ```text
 DOCKERHUB_USERNAME
 DOCKERHUB_TOKEN
 ```
 
-The workflow runs on pushes to `main`, on tags matching `v*`, and manually through `workflow_dispatch`.
-
-Published tags:
-
-- `latest` for the default branch;
-- the Git tag, for example `v0.4.0`;
-- semantic version aliases, for example `0.4.0` and `0.4`;
-- a commit SHA tag, for example `sha-abc1234`.
-
-## UI
-
-```bash
-cd raccourcis/ui
-npm install
-npm run dev -- --host 0.0.0.0 --port 5173
-```
-
-The frontend calls the API on the same host at port `8000`.
-
-Example: if the page is opened at `http://localhost:5173`, API calls go to `http://localhost:8000`.
-
-To force a different API address:
-
-```bash
-VITE_API_URL=http://api.example.lan:8000 npm run dev -- --host 0.0.0.0 --port 5173
-```
+Published tags include `latest`, Git tags such as `v0.4.0`, semver aliases such as `0.4.0` and `0.4`, and `sha-...`.
