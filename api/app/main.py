@@ -2,6 +2,7 @@ import asyncio
 import hashlib
 import logging
 import mimetypes
+import os
 import re
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -33,6 +34,7 @@ HOMARR_DASHBOARD_ICONS_TREE_URL = "https://api.github.com/repos/homarr-labs/dash
 HOMARR_DASHBOARD_ICONS_CDN = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons"
 MAX_ICON_BYTES = 2 * 1024 * 1024
 BUILTIN_ICON_DOWNLOAD_CONCURRENCY = 12
+APP_VERSION = os.getenv("SHORTCUTER_VERSION", "dev")
 ICON_EXTENSIONS = (".svg", ".png", ".webp", ".ico", ".jpg", ".jpeg", ".gif")
 ICON_CACHE: dict[str, tuple[float, str]] = {}
 BUILTIN_ICON_CACHE: tuple[float, list[dict[str, str]]] | None = None
@@ -120,6 +122,10 @@ class ShortcutsResponse(BaseModel):
 
 class BuiltinIconsResponse(BaseModel):
     icons: list[dict[str, str]]
+
+
+class VersionResponse(BaseModel):
+    version: str
 
 
 def favicon_url(url: str) -> str:
@@ -573,7 +579,12 @@ async def force_cors_headers(request, call_next):
 
 @app.get("/health")
 async def health() -> dict[str, str]:
-    return {"status": "ok"}
+    return {"status": "ok", "version": APP_VERSION}
+
+
+@app.get("/version", response_model=VersionResponse)
+async def version() -> VersionResponse:
+    return VersionResponse(version=APP_VERSION)
 
 
 @app.get("/icons/{filename}")

@@ -15,6 +15,27 @@ export function displayHost(url) {
   }
 }
 
+function normalizeSearch(value) {
+  return String(value || '')
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase()
+}
+
+export function matchesShortcutSearch(shortcut, search, pages = []) {
+  const page = pages.find((item) => item.id === shortcut.page)
+  const haystack = normalizeSearch([
+    shortcut.name,
+    shortcut.description,
+    shortcut.group,
+    shortcut.url,
+    displayHost(shortcut.url),
+    page?.title,
+    page?.rubrique,
+  ].filter(Boolean).join(' '))
+  return normalizeSearch(search).split(/\s+/).filter(Boolean).every((term) => haystack.includes(term))
+}
+
 export function iconSource(shortcut, builtinIcons) {
   if (shortcut.icon_type === 'predefined') {
     const key = shortcut.icon_value.replace(/\.[^.]+$/, '')

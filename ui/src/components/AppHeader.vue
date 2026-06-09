@@ -21,6 +21,9 @@
       <button class="icon-button" type="button" :title="themeTitle" @click="$emit('toggle-theme')">
         <i :class="['mdi', theme === 'dark' ? 'mdi-weather-sunny' : 'mdi-weather-night']"></i>
       </button>
+      <button class="icon-button" type="button" :title="compactTitle" @click="$emit('toggle-compact-view')">
+        <i :class="['mdi', compactView ? 'mdi-view-agenda-outline' : 'mdi-view-compact-outline']"></i>
+      </button>
     </div>
   </header>
 </template>
@@ -61,9 +64,17 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  compactTitle: {
+    type: String,
+    required: true,
+  },
+  compactView: {
+    type: Boolean,
+    required: true,
+  },
 })
 
-defineEmits(['select-page', 'toggle-theme'])
+defineEmits(['select-page', 'toggle-compact-view', 'toggle-theme'])
 
 function tabStyle(item) {
   const accent = normalizeAccent(item.accent || props.page.accent)

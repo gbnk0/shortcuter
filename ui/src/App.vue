@@ -9,7 +9,10 @@
       :subtitle="pageSubtitle"
       :theme="theme"
       :theme-title="themeTitle"
+      :compact-title="compactTitle"
+      :compact-view="compactView"
       @select-page="selectPage"
+      @toggle-compact-view="toggleCompactView"
       @toggle-theme="toggleTheme"
     />
 
@@ -18,8 +21,13 @@
       v-model:search-query="searchQuery"
       :active-page="activePage"
       :builtin-icons="builtinIcons"
+      :compact-view="compactView"
+      :favorite-ids="favoriteIds"
+      :favorite-set="favoriteSet"
       :loading="loading"
+      :pages="pages"
       :page-shortcuts="pageShortcuts"
+      @toggle-favorite="toggleFavorite"
     />
 
     <BuiltinIconsView
@@ -29,7 +37,12 @@
       :icons="builtinIcons"
     />
 
-    <p v-if="error" class="error-message">{{ error }}</p>
+    <section v-if="error" class="config-error">
+      <div>
+        <strong>{{ error.title }}</strong>
+        <p>{{ error.message }}</p>
+      </div>
+    </section>
 
     <AppFooter :active-view="activeView" :version="appVersion" @toggle-icons-view="toggleIconsView" />
   </main>
@@ -42,6 +55,7 @@ import AppFooter from './components/AppFooter.vue'
 import AppHeader from './components/AppHeader.vue'
 import BuiltinIconsView from './components/BuiltinIconsView.vue'
 import ShortcutsView from './components/ShortcutsView.vue'
+import { useDisplayPreferences } from './composables/useDisplayPreferences'
 import { useAppRoutes } from './composables/useAppRoutes'
 import { useTheme } from './composables/useTheme'
 import { API_BASE, APP_VERSION } from './constants'
@@ -52,7 +66,7 @@ const appVersion = APP_VERSION
 const shortcuts = ref([])
 const builtinIcons = ref([])
 const loading = ref(false)
-const error = ref('')
+const error = ref(null)
 const searchQuery = ref('')
 const iconSearchQuery = ref('')
 const page = ref({
@@ -86,6 +100,14 @@ const {
 } = useAppRoutes()
 
 const { theme, themeTitle, initTheme, toggleTheme } = useTheme()
+const {
+  compactTitle,
+  compactView,
+  favoriteIds,
+  favoriteSet,
+  toggleCompactView,
+  toggleFavorite,
+} = useDisplayPreferences()
 
 const showAllTab = computed(() => page.value.show_all_tab === true)
 
@@ -138,15 +160,27 @@ const pageSubtitle = computed(() => {
 
 function apiError(err) {
   const detail = err?.response?.data?.detail
-  if (Array.isArray(detail)) {
-    return detail.map((item) => item.msg).join(', ')
+  const message = Array.isArray(detail)
+    ? detail.map((item) => item.msg).join(', ')
+    : detail || err.message || 'Unknown error'
+  const isConfigError = err?.response?.status >= 500 && /yaml|shortcut|page|url/i.test(message)
+  return {
+    title: isConfigError ? 'Configuration error' : 'Unable to load shortcuts',
+    message,
   }
-  return detail || err.message || 'Unknown error'
+}
+
+function pruneFavorites() {
+  const ids = new Set(shortcuts.value.map((shortcut) => shortcut.id))
+  const staleIds = favoriteIds.value.filter((id) => !ids.has(id))
+  for (const id of staleIds) {
+    toggleFavorite(id)
+  }
 }
 
 async function loadShortcuts() {
   loading.value = true
-  error.value = ''
+  error.value = null
   try {
     const response = await axios.get(`${API_BASE}/shortcuts`)
     page.value = response.data.page || page.value
@@ -166,6 +200,7 @@ async function loadShortcuts() {
       replaceRoute(`/page/${activePage.value}`)
     }
     lastShortcutPage.value = activePage.value
+    pruneFavorites()
   } catch (err) {
     error.value = apiError(err)
   } finally {

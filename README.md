@@ -7,7 +7,7 @@ Read-only shortcuts dashboard backed by a YAML file. The Docker image serves bot
 ## Quick Start
 
 ```bash
-docker compose up -d --build
+cp -n shortcuts.example.yaml shortcuts.yaml && docker compose up -d --build
 ```
 
 Open:
@@ -16,7 +16,7 @@ Open:
 http://localhost:8000
 ```
 
-By default, Compose runs with the bundled `shortcuts.example.yaml`.
+The command creates `shortcuts.yaml` from the bundled example if it does not already exist, then starts the app.
 
 ## Configure
 
@@ -24,13 +24,6 @@ Create your private local config:
 
 ```bash
 cp shortcuts.example.yaml shortcuts.yaml
-```
-
-Then edit `docker-compose.yml` and switch the mounted file:
-
-```yaml
-volumes:
-  - ./shortcuts.yaml:/shortcuts.yaml:ro
 ```
 
 `shortcuts.yaml` is ignored by Git.

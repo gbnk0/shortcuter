@@ -5,9 +5,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./shortcuts.example.yaml:/shortcuts.yaml:ro
-      # Use this instead for a local private config:
-      # - ./shortcuts.yaml:/shortcuts.yaml:ro
+      - ./shortcuts.yaml:/shortcuts.yaml:ro
       - icon-cache:/app/api/icon-cache
     restart: unless-stopped
 

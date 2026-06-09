@@ -7,8 +7,22 @@
   </template>
 
   <Transition name="tab-panel" mode="out-in">
-    <div v-if="!loading" :key="activePage" class="tab-panel">
+    <div v-if="!loading" :key="activePage" class="tab-panel" :class="{ compact: compactView }">
       <SearchBar v-model="query" placeholder="Search applications" autofocus :focus-key="activePage" />
+
+      <section v-if="favoriteShortcuts.length" class="group-section favorites-section">
+        <h2>Favorites</h2>
+        <div class="shortcuts-grid">
+          <ShortcutCard
+            v-for="shortcut in favoriteShortcuts"
+            :key="shortcut.id"
+            :builtin-icons="builtinIcons"
+            :is-favorite="favoriteSet.has(shortcut.id)"
+            :shortcut="shortcut"
+            @toggle-favorite="$emit('toggle-favorite', $event)"
+          />
+        </div>
+      </section>
 
       <section v-for="group in groups" :key="group.name" class="group-section">
         <h2>{{ group.name }}</h2>
@@ -17,7 +31,9 @@
             v-for="shortcut in group.items"
             :key="shortcut.id"
             :builtin-icons="builtinIcons"
+            :is-favorite="favoriteSet.has(shortcut.id)"
             :shortcut="shortcut"
+            @toggle-favorite="$emit('toggle-favorite', $event)"
           />
         </div>
       </section>
@@ -39,7 +55,7 @@
 import { computed } from 'vue'
 import SearchBar from './SearchBar.vue'
 import ShortcutCard from './ShortcutCard.vue'
-import { groupShortcuts } from '../utils/shortcuts'
+import { groupShortcuts, matchesShortcutSearch } from '../utils/shortcuts'
 
 const props = defineProps({
   activePage: {
@@ -54,6 +70,22 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  compactView: {
+    type: Boolean,
+    default: false,
+  },
+  favoriteIds: {
+    type: Array,
+    default: () => [],
+  },
+  favoriteSet: {
+    type: Object,
+    default: () => new Set(),
+  },
+  pages: {
+    type: Array,
+    default: () => [],
+  },
   pageShortcuts: {
     type: Array,
     default: () => [],
@@ -64,7 +96,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update:searchQuery'])
+const emit = defineEmits(['toggle-favorite', 'update:searchQuery'])
 
 const query = computed({
   get: () => props.searchQuery,
@@ -76,17 +108,16 @@ const filteredShortcuts = computed(() => {
   if (!search) {
     return props.pageShortcuts
   }
-  return props.pageShortcuts.filter((shortcut) => {
-    return [
-      shortcut.name,
-      shortcut.description,
-      shortcut.group,
-      shortcut.url,
-    ]
-      .filter(Boolean)
-      .some((value) => value.toLowerCase().includes(search))
-  })
+  return props.pageShortcuts.filter((shortcut) => matchesShortcutSearch(shortcut, search, props.pages))
 })
 
-const groups = computed(() => groupShortcuts(filteredShortcuts.value))
+const favoriteShortcuts = computed(() => {
+  const byId = new Map(filteredShortcuts.value.map((shortcut) => [shortcut.id, shortcut]))
+  return props.favoriteIds.map((id) => byId.get(id)).filter(Boolean)
+})
+
+const groups = computed(() => {
+  const favoriteIds = new Set(favoriteShortcuts.value.map((shortcut) => shortcut.id))
+  return groupShortcuts(filteredShortcuts.value.filter((shortcut) => !favoriteIds.has(shortcut.id)))
+})
 </script>
