@@ -256,10 +256,6 @@ input {
   box-shadow: 0 8px 22px var(--shadow);
 }
 
-.shortcut-card.favorite {
-  border-color: color-mix(in srgb, var(--accent) 54%, var(--border));
-}
-
 .shortcut-link {
   display: grid;
   grid-template-columns: 48px minmax(0, 1fr) 24px;
@@ -388,35 +384,6 @@ input {
   to {
     transform: translateX(var(--scroll-distance));
   }
-}
-
-.favorite-button {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  z-index: 2;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border: 0;
-  border-radius: 7px;
-  background: transparent;
-  color: var(--text-muted);
-}
-
-.favorite-button:hover,
-.favorite-button[aria-pressed="true"] {
-  background: var(--card-muted);
-  color: var(--accent);
-}
-
-.tab-panel.compact .favorite-button {
-  top: 4px;
-  right: 4px;
-  width: 26px;
-  height: 26px;
 }
 
 .open-icon {

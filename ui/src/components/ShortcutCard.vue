@@ -1,14 +1,5 @@
 <template>
-  <article class="shortcut-card" :class="{ favorite: isFavorite }" @mouseenter="prepareDescriptionScroll">
-    <button
-      class="favorite-button"
-      type="button"
-      :title="isFavorite ? 'Remove favorite' : 'Add favorite'"
-      :aria-pressed="isFavorite"
-      @click="$emit('toggle-favorite', shortcut.id)"
-    >
-      <i :class="['mdi', isFavorite ? 'mdi-star' : 'mdi-star-outline']"></i>
-    </button>
+  <article class="shortcut-card" @mouseenter="prepareDescriptionScroll">
     <a class="shortcut-link" :href="shortcut.url" target="_blank" rel="noopener noreferrer">
       <span class="shortcut-icon">
         <img v-if="shortcut.icon_type !== 'preset' && shortcut.icon_value" :src="iconUrl" alt="" @error="hideBrokenImage" />
@@ -46,13 +37,7 @@ const props = defineProps({
     type: Object,
     required: true,
   },
-  isFavorite: {
-    type: Boolean,
-    default: false,
-  },
 })
-
-defineEmits(['toggle-favorite'])
 
 const iconUrl = computed(() => iconSource(props.shortcut, props.builtinIcons))
 

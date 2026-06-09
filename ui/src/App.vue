@@ -22,12 +22,9 @@
       :active-page="activePage"
       :builtin-icons="builtinIcons"
       :compact-view="compactView"
-      :favorite-ids="favoriteIds"
-      :favorite-set="favoriteSet"
       :loading="loading"
       :pages="pages"
       :page-shortcuts="pageShortcuts"
-      @toggle-favorite="toggleFavorite"
     />
 
     <BuiltinIconsView
@@ -103,10 +100,7 @@ const { theme, themeTitle, initTheme, toggleTheme } = useTheme()
 const {
   compactTitle,
   compactView,
-  favoriteIds,
-  favoriteSet,
   toggleCompactView,
-  toggleFavorite,
 } = useDisplayPreferences()
 
 const showAllTab = computed(() => page.value.show_all_tab === true)
@@ -170,14 +164,6 @@ function apiError(err) {
   }
 }
 
-function pruneFavorites() {
-  const ids = new Set(shortcuts.value.map((shortcut) => shortcut.id))
-  const staleIds = favoriteIds.value.filter((id) => !ids.has(id))
-  for (const id of staleIds) {
-    toggleFavorite(id)
-  }
-}
-
 async function loadShortcuts() {
   loading.value = true
   error.value = null
@@ -200,7 +186,6 @@ async function loadShortcuts() {
       replaceRoute(`/page/${activePage.value}`)
     }
     lastShortcutPage.value = activePage.value
-    pruneFavorites()
   } catch (err) {
     error.value = apiError(err)
   } finally {
