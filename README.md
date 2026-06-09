@@ -92,3 +92,7 @@ VITE_API_URL=http://localhost:8000 npm run dev -- --host 0.0.0.0 --port 5173
 ```
 
 Open `http://localhost:5173`.
+
+## Acknowledgements
+
+Shortcuter can use icons from [Homarr Labs Dashboard Icons](https://github.com/homarr-labs/dashboard-icons), which is licensed under the [Apache License 2.0](https://github.com/homarr-labs/dashboard-icons/blob/main/LICENSE). Product names, trademarks, and registered trademarks remain the property of their respective owners.
