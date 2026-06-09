@@ -6,6 +6,7 @@ general:
   download-icons: true
   show_all_tab: true
   all_tab_accent: slate
+  add_tab_name_on_duplicate_app: true
 
 pages:
   - title: General

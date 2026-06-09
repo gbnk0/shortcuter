@@ -112,6 +112,7 @@ class PageConfig(BaseModel):
     accent: str = "green"
     show_all_tab: bool = False
     all_tab_accent: str = ""
+    add_tab_name_on_duplicate_app: bool = True
 
 
 class ShortcutsResponse(BaseModel):
@@ -166,10 +167,10 @@ def slugify(value: str, fallback: str = "item") -> str:
     return re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-") or fallback
 
 
-def generated_shortcut_id(item: dict) -> str:
+def generated_shortcut_id(item: dict, page_id: str) -> str:
     source = str(item.get("name") or urlparse(str(item.get("url") or "")).netloc or "shortcut")
     slug = re.sub(r"[^a-z0-9]+", "-", source.lower()).strip("-") or "shortcut"
-    digest = hashlib.sha1(str(item.get("url") or source).encode("utf-8")).hexdigest()[:8]
+    digest = hashlib.sha1(f"{page_id}:{item.get('url') or source}".encode("utf-8")).hexdigest()[:8]
     return f"{slug}-{digest}"
 
 
@@ -434,7 +435,7 @@ def shortcut_from_yaml(item: dict, default_page_id: str) -> Shortcut:
         )
 
     shortcut = Shortcut(
-        id=str(item.get("id") or generated_shortcut_id(item)),
+        id=str(item.get("id") or generated_shortcut_id(item, default_page_id)),
         page=str(item.get("page") or default_page_id),
         name=item.get("name", ""),
         url=url,
@@ -477,6 +478,7 @@ def load_page(content: dict) -> PageConfig:
         accent=str(raw_page.get("accent") or "green"),
         show_all_tab=bool(raw_page.get("show_all_tab")),
         all_tab_accent=str(raw_page.get("all_tab_accent") or ""),
+        add_tab_name_on_duplicate_app=raw_page.get("add_tab_name_on_duplicate_app", True) is not False,
     )
 
 
@@ -528,7 +530,35 @@ def load_pages(content: dict, default_page: PageConfig) -> list[dict]:
                     detail=f"Shortcut #{shortcut_index + 1} on page {page['id']}: {exc}",
                 ) from exc
         pages.append(page)
-    return pages or load_pages({}, default_page)
+    pages = pages or load_pages({}, default_page)
+    if default_page.add_tab_name_on_duplicate_app:
+        append_page_name_to_duplicate_shortcuts(pages)
+    return pages
+
+
+def duplicate_shortcut_key(shortcut: Shortcut) -> str:
+    return shortcut.name.strip().casefold()
+
+
+def append_page_name_to_duplicate_shortcuts(pages: list[dict]) -> None:
+    page_titles = {
+        page["id"]: page["title"]
+        for page in pages
+    }
+    occurrences: dict[str, set[str]] = {}
+    for page in pages:
+        for shortcut in page["shortcuts"]:
+            occurrences.setdefault(duplicate_shortcut_key(shortcut), set()).add(page["id"])
+
+    duplicate_keys = {
+        key
+        for key, page_ids in occurrences.items()
+        if key and len(page_ids) > 1
+    }
+    for page in pages:
+        for shortcut in page["shortcuts"]:
+            if duplicate_shortcut_key(shortcut) in duplicate_keys:
+                shortcut.name = f"{shortcut.name} ({page_titles.get(shortcut.page, page['title'])})"
 
 
 async def enrich_auto_icons(shortcuts: list[Shortcut]) -> list[Shortcut]:

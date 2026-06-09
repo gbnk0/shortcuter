@@ -37,6 +37,7 @@ general:
   rubrique: Links
   accent: green
   show_all_tab: true
+  add_tab_name_on_duplicate_app: true
 
 pages:
   - title: General
@@ -65,6 +66,8 @@ badge:
   icon: mdi-hammer-wrench
   tooltip: Maintenance in progress
 ```
+
+When `general.add_tab_name_on_duplicate_app` is enabled, duplicate shortcut names across tabs are displayed as `App Name (Tab Name)`.
 
 ## Local Development
 
