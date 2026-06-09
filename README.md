@@ -2,6 +2,8 @@
 
 Read-only shortcuts dashboard backed by a YAML file. The Docker image serves both the FastAPI backend and the Vue frontend.
 
+<img src="docs/demo.gif" alt="Shortcuter demo" width="800">
+
 ## Quick Start
 
 ```bash
