@@ -251,8 +251,8 @@ input {
 }
 
 .shortcut-card:hover {
-  border-color: var(--accent);
-  background: color-mix(in srgb, var(--card) 94%, var(--accent) 6%);
+  border-color: var(--card-accent, var(--accent));
+  background: color-mix(in srgb, var(--card) 94%, var(--card-accent, var(--accent)) 6%);
   box-shadow: 0 8px 22px var(--shadow);
 }
 
@@ -396,7 +396,7 @@ input {
 
 .shortcut-card:hover .open-icon,
 .shortcut-card:focus-within .open-icon {
-  color: var(--accent);
+  color: var(--card-accent, var(--accent));
   opacity: 1;
 }
 

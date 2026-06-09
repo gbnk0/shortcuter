@@ -17,6 +17,7 @@
             v-for="shortcut in group.items"
             :key="shortcut.id"
             :builtin-icons="builtinIcons"
+            :source-accent="sourceAccent(shortcut)"
             :shortcut="shortcut"
           />
         </div>
@@ -39,6 +40,7 @@
 import { computed } from 'vue'
 import SearchBar from './SearchBar.vue'
 import ShortcutCard from './ShortcutCard.vue'
+import { normalizeAccent } from '../utils/accent'
 import { groupShortcuts, matchesShortcutSearch } from '../utils/shortcuts'
 
 const props = defineProps({
@@ -88,4 +90,12 @@ const filteredShortcuts = computed(() => {
 })
 
 const groups = computed(() => groupShortcuts(filteredShortcuts.value))
+
+function sourceAccent(shortcut) {
+  if (props.activePage !== '__all') {
+    return ''
+  }
+  const accent = props.pages.find((page) => page.id === shortcut.page)?.accent
+  return accent ? normalizeAccent(accent) : ''
+}
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <article class="shortcut-card" @mouseenter="prepareDescriptionScroll">
+  <article class="shortcut-card" :style="cardStyle" @mouseenter="prepareDescriptionScroll">
     <a class="shortcut-link" :href="shortcut.url" target="_blank" rel="noopener noreferrer">
       <span class="shortcut-icon">
         <img v-if="shortcut.icon_type !== 'preset' && shortcut.icon_value" :src="iconUrl" alt="" @error="hideBrokenImage" />
@@ -37,9 +37,14 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  sourceAccent: {
+    type: String,
+    default: '',
+  },
 })
 
 const iconUrl = computed(() => iconSource(props.shortcut, props.builtinIcons))
+const cardStyle = computed(() => props.sourceAccent ? { '--card-accent': props.sourceAccent } : {})
 
 function hideBrokenImage(event) {
   event.target.style.display = 'none'
