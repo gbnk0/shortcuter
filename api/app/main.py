@@ -110,8 +110,18 @@ class PageConfig(BaseModel):
     subtitle: str = ""
     rubrique: str = "General"
     accent: str = "green"
+    display_density: Literal["comfortable", "compact"] = "comfortable"
+    language: str = Field(default="auto", max_length=16)
+    logo: str = Field(default="/logo.png", max_length=2048)
+    favicon: str = Field(default="", max_length=2048)
+    favicon_png: str = Field(default="", max_length=2048)
+    apple_touch_icon: str = Field(default="", max_length=2048)
+    icon_192: str = Field(default="", max_length=2048)
     show_all_tab: bool = False
     all_tab_accent: str = ""
+    show_footer: bool = True
+    show_theme_toggle: bool = True
+    show_density_toggle: bool = True
     add_tab_name_on_duplicate_app: bool = True
 
 
@@ -471,13 +481,29 @@ def load_page(content: dict) -> PageConfig:
     raw_page = content.get("general") or {}
     if raw_page and not isinstance(raw_page, dict):
         raise HTTPException(status_code=500, detail="YAML field 'general' must be an object")
+    display_density = str(raw_page.get("display_density") or "comfortable").strip().lower()
+    if display_density not in {"comfortable", "compact"}:
+        raise HTTPException(
+            status_code=500,
+            detail="YAML field 'general.display_density' must be 'comfortable' or 'compact'",
+        )
     return PageConfig(
         title=str(raw_page.get("title") or "Shortcuter"),
         subtitle=str(raw_page.get("subtitle") or ""),
         rubrique=str(raw_page.get("rubrique") or "General"),
         accent=str(raw_page.get("accent") or "green"),
+        display_density=display_density,
+        language=str(raw_page.get("language") or "auto"),
+        logo=str(raw_page.get("logo") or "/logo.png"),
+        favicon=str(raw_page.get("favicon") or ""),
+        favicon_png=str(raw_page.get("favicon_png") or ""),
+        apple_touch_icon=str(raw_page.get("apple_touch_icon") or ""),
+        icon_192=str(raw_page.get("icon_192") or ""),
         show_all_tab=bool(raw_page.get("show_all_tab")),
         all_tab_accent=str(raw_page.get("all_tab_accent") or ""),
+        show_footer=raw_page.get("show_footer", True) is not False,
+        show_theme_toggle=raw_page.get("show_theme_toggle", True) is not False,
+        show_density_toggle=raw_page.get("show_density_toggle", True) is not False,
         add_tab_name_on_duplicate_app=raw_page.get("add_tab_name_on_duplicate_app", True) is not False,
     )
 
@@ -602,7 +628,7 @@ async def force_cors_headers(request, call_next):
     else:
         response = await call_next(request)
     response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+    response.headers["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "*"
     return response
 
@@ -660,8 +686,11 @@ async def serve_ui_root() -> HTMLResponse:
     return ui_index()
 
 
-@app.get("/{path:path}", response_class=HTMLResponse)
-async def serve_ui_path(path: str) -> HTMLResponse:
+@app.api_route("/{path:path}", methods=["GET", "HEAD"], response_class=HTMLResponse)
+async def serve_ui_path(path: str):
     if "." in Path(path).name:
+        asset_path = UI_DIST_DIR / path
+        if asset_path.is_file() and asset_path.resolve().is_relative_to(UI_DIST_DIR.resolve()):
+            return FileResponse(asset_path)
         raise HTTPException(status_code=404, detail="File not found")
     return ui_index()

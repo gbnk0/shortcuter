@@ -1,10 +1,16 @@
 <template>
   <section class="builtin-icons-view">
     <div class="builtin-icons-header">
-      <h2>Icon Catalog</h2>
-      <span>{{ filteredIcons.length }} / {{ icons.length }} icon{{ icons.length > 1 ? 's' : '' }}</span>
+      <h2>{{ labels.iconCatalog }}</h2>
+      <span>{{ labels.iconCount(filteredIcons.length, icons.length) }}</span>
     </div>
-    <SearchBar v-model="query" placeholder="Search icons" autofocus :focus-key="activeView" />
+    <SearchBar
+      v-model="query"
+      :clear-title="labels.clearSearch"
+      :placeholder="labels.searchIcons"
+      autofocus
+      :focus-key="activeView"
+    />
     <div class="builtin-icons-grid">
       <article v-for="icon in filteredIcons" :key="icon.key" class="builtin-icon-card">
         <span class="builtin-icon-preview">
@@ -16,7 +22,7 @@
     </div>
     <section v-if="filteredIcons.length === 0" class="empty-state">
       <i class="mdi mdi-magnify-close"></i>
-      <span>No icons</span>
+      <span>{{ labels.noIcons }}</span>
     </section>
   </section>
 </template>
@@ -38,6 +44,10 @@ const props = defineProps({
   searchQuery: {
     type: String,
     default: '',
+  },
+  labels: {
+    type: Object,
+    required: true,
   },
 })
 

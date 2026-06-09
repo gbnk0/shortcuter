@@ -9,7 +9,7 @@
       :autofocus="autofocus"
       @input="$emit('update:modelValue', $event.target.value.trim())"
     />
-    <button v-if="modelValue" class="clear-search" type="button" title="Clear" @click="$emit('update:modelValue', '')">
+    <button v-if="modelValue" class="clear-search" type="button" :title="clearTitle" @click="$emit('update:modelValue', '')">
       <i class="mdi mdi-close"></i>
     </button>
   </section>
@@ -34,6 +34,10 @@ const props = defineProps({
   focusKey: {
     type: [String, Number],
     default: '',
+  },
+  clearTitle: {
+    type: String,
+    default: 'Clear search',
   },
 })
 

@@ -1,8 +1,7 @@
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 
 export function useTheme() {
   const theme = ref('light')
-  const themeTitle = computed(() => (theme.value === 'dark' ? 'Light theme' : 'Dark theme'))
 
   function applyTheme(nextTheme) {
     theme.value = nextTheme
@@ -28,7 +27,6 @@ export function useTheme() {
 
   return {
     theme,
-    themeTitle,
     initTheme,
     toggleTheme,
   }

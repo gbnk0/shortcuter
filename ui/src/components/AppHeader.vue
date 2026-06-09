@@ -1,12 +1,11 @@
 <template>
   <header class="topbar">
-    <div>
-      <span class="rubrique">{{ page.rubrique }}</span>
+    <div class="page-title">
       <h1>{{ currentPage.title }}</h1>
       <p>{{ subtitle }}</p>
     </div>
     <div class="top-actions">
-      <div class="view-tabs" role="tablist" aria-label="Views">
+      <div class="view-tabs" role="tablist" :aria-label="viewsLabel">
         <button
           v-for="item in pages"
           :key="item.id"
@@ -18,12 +17,6 @@
           <span>{{ item.title }}</span>
         </button>
       </div>
-      <button class="icon-button" type="button" :title="themeTitle" @click="$emit('toggle-theme')">
-        <i :class="['mdi', theme === 'dark' ? 'mdi-weather-sunny' : 'mdi-weather-night']"></i>
-      </button>
-      <button class="icon-button" type="button" :title="compactTitle" @click="$emit('toggle-compact-view')">
-        <i :class="['mdi', compactView ? 'mdi-view-agenda-outline' : 'mdi-view-compact-outline']"></i>
-      </button>
     </div>
   </header>
 </template>
@@ -56,25 +49,13 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  theme: {
+  viewsLabel: {
     type: String,
-    required: true,
-  },
-  themeTitle: {
-    type: String,
-    required: true,
-  },
-  compactTitle: {
-    type: String,
-    required: true,
-  },
-  compactView: {
-    type: Boolean,
     required: true,
   },
 })
 
-defineEmits(['select-page', 'toggle-compact-view', 'toggle-theme'])
+defineEmits(['select-page'])
 
 function tabStyle(item) {
   const accent = normalizeAccent(item.accent || props.page.accent)

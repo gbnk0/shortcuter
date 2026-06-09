@@ -1,10 +1,16 @@
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 
 const COMPACT_KEY = 'shortcuter-compact-view'
 
 export function useDisplayPreferences() {
   const compactView = ref(localStorage.getItem(COMPACT_KEY) === 'true')
-  const compactTitle = computed(() => (compactView.value ? 'Comfortable view' : 'Compact view'))
+
+  function applyDefaultDisplayDensity(displayDensity) {
+    if (localStorage.getItem(COMPACT_KEY) !== null) {
+      return
+    }
+    compactView.value = displayDensity === 'compact'
+  }
 
   function toggleCompactView() {
     compactView.value = !compactView.value
@@ -12,7 +18,7 @@ export function useDisplayPreferences() {
   }
 
   return {
-    compactTitle,
+    applyDefaultDisplayDensity,
     compactView,
     toggleCompactView,
   }

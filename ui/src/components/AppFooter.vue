@@ -1,9 +1,10 @@
 <template>
   <footer class="app-footer">
-    <span>Version {{ version }}</span>
+    <span>{{ labels.version }} {{ version }}</span>
     <button type="button" @click="$emit('toggle-icons-view')">
-      {{ activeView === 'icons' ? 'Back to shortcuts' : 'YAML icon catalog' }}
+      {{ activeView === 'icons' ? labels.backToShortcuts : labels.yamlIconCatalog }}
     </button>
+    <a href="https://github.com/gbnk0/shortcuter" target="_blank" rel="noreferrer">GitHub</a>
   </footer>
 </template>
 
@@ -15,6 +16,10 @@ defineProps({
   },
   version: {
     type: String,
+    required: true,
+  },
+  labels: {
+    type: Object,
     required: true,
   },
 })

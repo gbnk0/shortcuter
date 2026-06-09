@@ -2,14 +2,12 @@
   <template v-if="loading">
     <section class="empty-state">
       <i class="mdi mdi-loading mdi-spin"></i>
-      <span>Loading</span>
+      <span>{{ labels.loading }}</span>
     </section>
   </template>
 
   <Transition name="tab-panel" mode="out-in">
     <div v-if="!loading" :key="activePage" class="tab-panel" :class="{ compact: compactView }">
-      <SearchBar v-model="query" placeholder="Search applications" autofocus :focus-key="activePage" />
-
       <section v-for="group in groups" :key="group.name" class="group-section">
         <h2>{{ group.name }}</h2>
         <div class="shortcuts-grid">
@@ -25,12 +23,12 @@
 
       <section v-if="pageShortcuts.length === 0" class="empty-state">
         <i class="mdi mdi-apps"></i>
-        <span>No shortcuts on this page</span>
+        <span>{{ labels.noShortcuts }}</span>
       </section>
 
       <section v-else-if="filteredShortcuts.length === 0" class="empty-state">
         <i class="mdi mdi-magnify-close"></i>
-        <span>No results</span>
+        <span>{{ labels.noResults }}</span>
       </section>
     </div>
   </Transition>
@@ -38,7 +36,6 @@
 
 <script setup>
 import { computed } from 'vue'
-import SearchBar from './SearchBar.vue'
 import ShortcutCard from './ShortcutCard.vue'
 import { normalizeAccent } from '../utils/accent'
 import { groupShortcuts, matchesShortcutSearch } from '../utils/shortcuts'
@@ -72,17 +69,14 @@ const props = defineProps({
     type: String,
     default: '',
   },
-})
-
-const emit = defineEmits(['update:searchQuery'])
-
-const query = computed({
-  get: () => props.searchQuery,
-  set: (value) => emit('update:searchQuery', value),
+  labels: {
+    type: Object,
+    required: true,
+  },
 })
 
 const filteredShortcuts = computed(() => {
-  const search = query.value.trim().toLowerCase()
+  const search = props.searchQuery.trim().toLowerCase()
   if (!search) {
     return props.pageShortcuts
   }

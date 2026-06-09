@@ -1,26 +1,70 @@
+# Shortcuter example configuration.
+# Copy this file to shortcuts.yaml, then replace the sample URLs and labels with your own services.
+
+# Global settings apply to the whole dashboard.
 general:
+  # Browser/page title shown in the header.
   title: Shortcuter
+  # Short text displayed below the main title.
   subtitle: Internal apps and services
+  # Small label displayed above the main title.
   rubrique: Links
+  # Default accent color used by the dashboard.
   accent: green
+  # Default card spacing. Use "comfortable" for a spacious layout or "compact" for dense cards.
+  # Users can still override this locally with the header button in their browser.
+  display_density: comfortable
+  # UI language for built-in labels. Use "auto" to follow the browser, or force "en", "fr", "es", or "de".
+  language: auto
+  # Optional branding asset. Favicons and touch icons use this logo unless overridden below.
+  # Use local public paths such as "/logo.png" or full external URLs.
+  logo: /logo.png
+  # Optional advanced overrides:
+  # favicon: /favicon.ico
+  # favicon_png: /favicon-32x32.png
+  # apple_touch_icon: /apple-touch-icon.png
+  # icon_192: /icon-192.png
+  # When true, Shortcuter downloads remote icon references into its local cache.
   download-icons: true
+  # When true, Shortcuter creates an "All" tab containing shortcuts from every page.
   show_all_tab: true
+  # Accent color used by the generated "All" tab.
   all_tab_accent: slate
+  # When true, show the footer with the version, icon catalog link, and GitHub link.
+  show_footer: true
+  # When true, show the theme toggle button.
+  show_theme_toggle: true
+  # When true, show the compact/comfortable view toggle button.
+  show_density_toggle: true
+  # When the same shortcut name exists in multiple tabs, append the tab name in the "All" view.
+  # Example: "Grafana" becomes "Grafana (Ops)" and "Grafana (Data)".
   add_tab_name_on_duplicate_app: true
 
+# Pages become top navigation tabs.
 pages:
   - title: General
+    # Optional subtitle shown when this page is selected.
     subtitle: Daily quick access
+    # Optional page label shown above the page title.
     rubrique: Home
+    # Page accent used for the tab, hover states, and cards from this page in the "All" tab.
     accent: green
+    # Shortcuts are the application cards displayed on this page.
     shortcuts:
       - name: Documentation
+        # Target URL opened when clicking the card.
         url: https://docs.example.lan
+        # Cards with the same group are displayed under the same section heading.
         group: Resources
+        # Short helper text displayed under the card title.
         description: Internal documentation and procedures
+        # Icon source. "homarr/name" uses icons from the Homarr dashboard-icons project.
         icon: homarr/bookstack
+        # Optional status badge displayed on the icon.
         badge:
+          # Badge icon. "mdi-name" uses Material Design Icons.
           icon: mdi-hammer-wrench
+          # Text shown when hovering the badge.
           tooltip: Content migration in progress
 
       - name: Wiki
