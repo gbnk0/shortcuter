@@ -92,16 +92,3 @@ VITE_API_URL=http://localhost:8000 npm run dev -- --host 0.0.0.0 --port 5173
 ```
 
 Open `http://localhost:5173`.
-
-## Docker Hub Publishing
-
-GitHub Actions publishes the image to Docker Hub on pushes to `main`, on `v*` tags, and from manual workflow runs.
-
-Required GitHub repository secrets:
-
-```text
-DOCKERHUB_USERNAME
-DOCKERHUB_TOKEN
-```
-
-Published tags include `latest`, Git tags such as `v0.4.0`, semver aliases such as `0.4.0` and `0.4`, and `sha-...`.
