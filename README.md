@@ -9,7 +9,7 @@ The Docker image serves both the FastAPI backend and the Vue frontend.
 ## Quick Start
 
 ```bash
-cp -n shortcuts.example.yaml shortcuts.yaml && docker compose up -d --build
+docker run -d --name shortcuter -p 8000:8000 -v "$(pwd)/shortcuts.yaml:/shortcuts.yaml:ro" gbnk0/shortcuter:latest
 ```
 
 Open:
@@ -18,7 +18,7 @@ Open:
 http://localhost:8000
 ```
 
-The command creates `shortcuts.yaml` from the bundled example if it does not already exist, then starts the app.
+The command starts the Docker Hub image with your local `shortcuts.yaml` mounted as read-only config.
 
 ## Configure
 
@@ -27,8 +27,6 @@ Create your private local config:
 ```bash
 cp shortcuts.example.yaml shortcuts.yaml
 ```
-
-`shortcuts.yaml` is ignored by Git.
 
 Minimal YAML:
 
