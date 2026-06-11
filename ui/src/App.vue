@@ -101,6 +101,7 @@ const iconSearchQuery = ref('')
 const branding = ref(DEFAULT_BRANDING)
 const page = ref({
   title: 'Shortcuter',
+  app_title: 'Shortcuter',
   subtitle: '',
   rubrique: 'Links',
   accent: 'green',
@@ -287,6 +288,9 @@ onMounted(() => {
 
 watch(() => currentPage.value.accent, (accent) => applyAccent(accent), { immediate: true })
 watch(branding, applyBranding, { immediate: true })
+watch(() => page.value.app_title || page.value.title, (nextTitle) => {
+  document.title = nextTitle || 'Shortcuter'
+}, { immediate: true })
 watch(locale, (nextLocale) => {
   document.documentElement.lang = nextLocale
 }, { immediate: true })

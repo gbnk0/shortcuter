@@ -1,3 +1,5 @@
+import { generateIconsFromImage } from './generatedIcons'
+
 export const DEFAULT_BRANDING = {
   appleTouchIcon: '/apple-touch-icon-v2.png',
   favicon: '/favicon-v2.ico',
@@ -5,8 +7,6 @@ export const DEFAULT_BRANDING = {
   icon192: '/icon-192-v2.png',
   logo: '/logo.png',
 }
-
-const generatedIconCache = new Map()
 
 function normalizeAssetPath(value) {
   if (!value) {
@@ -36,46 +36,6 @@ export function brandingFromPage(page = {}) {
   }
 }
 
-function imageLoaded(src) {
-  return new Promise((resolve, reject) => {
-    const image = new Image()
-    image.crossOrigin = 'anonymous'
-    image.onload = () => resolve(image)
-    image.onerror = reject
-    image.src = src
-  })
-}
-
-function resizedPngDataUrl(image, size) {
-  const canvas = document.createElement('canvas')
-  canvas.width = size
-  canvas.height = size
-  const context = canvas.getContext('2d')
-  context.clearRect(0, 0, size, size)
-  context.drawImage(image, 0, 0, size, size)
-  return canvas.toDataURL('image/png')
-}
-
-async function generateIcons(src) {
-  if (!src || typeof document === 'undefined') {
-    return null
-  }
-  if (!generatedIconCache.has(src)) {
-    generatedIconCache.set(
-      src,
-      imageLoaded(src)
-        .then((image) => ({
-          appleTouchIcon: resizedPngDataUrl(image, 180),
-          favicon: resizedPngDataUrl(image, 32),
-          faviconPng: resizedPngDataUrl(image, 32),
-          icon192: resizedPngDataUrl(image, 192),
-        }))
-        .catch(() => null),
-    )
-  }
-  return generatedIconCache.get(src)
-}
-
 function setHeadLink(selector, attributes) {
   let link = document.head.querySelector(selector)
   if (!link) {
@@ -92,7 +52,7 @@ function setHeadLink(selector, attributes) {
 }
 
 export async function applyBranding(branding) {
-  const generatedIcons = branding.generateIconsFromLogo ? await generateIcons(branding.logo) : null
+  const generatedIcons = branding.generateIconsFromLogo ? await generateIconsFromImage(branding.logo) : null
   const favicon = branding.favicon === branding.logo ? generatedIcons?.favicon || branding.favicon : branding.favicon
   const faviconPng =
     branding.faviconPng === branding.logo ? generatedIcons?.faviconPng || branding.faviconPng : branding.faviconPng

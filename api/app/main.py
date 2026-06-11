@@ -17,7 +17,7 @@ from fastapi import FastAPI, HTTPException, Response
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, Field, ValidationError, field_validator
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -107,6 +107,7 @@ class ShortcutPage(BaseModel):
 
 class PageConfig(BaseModel):
     title: str = "Shortcuter"
+    app_title: str = "Shortcuter"
     subtitle: str = ""
     rubrique: str = "General"
     accent: str = "green"
@@ -137,6 +138,61 @@ class BuiltinIconsResponse(BaseModel):
 
 class VersionResponse(BaseModel):
     version: str
+
+
+class YamlBaseModel(BaseModel):
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
+
+
+class YamlGeneralConfig(YamlBaseModel):
+    title: str = "Shortcuter"
+    app_title: str = Field(default="", max_length=120, validation_alias=AliasChoices("app_title", "apptitle"))
+    subtitle: str = ""
+    rubrique: str = "General"
+    accent: str = "green"
+    display_density: Literal["comfortable", "compact"] = "comfortable"
+    language: str = Field(default="auto", max_length=16)
+    logo: str = Field(default="/logo.png", max_length=2048)
+    favicon: str = Field(default="", max_length=2048)
+    favicon_png: str = Field(default="", max_length=2048)
+    apple_touch_icon: str = Field(default="", max_length=2048)
+    icon_192: str = Field(default="", max_length=2048)
+    download_icons: bool = Field(default=False, alias="download-icons")
+    show_all_tab: bool = False
+    all_tab_accent: str = ""
+    show_footer: bool = True
+    show_theme_toggle: bool = True
+    show_density_toggle: bool = True
+    add_tab_name_on_duplicate_app: bool = True
+
+
+class YamlBadgeConfig(YamlBaseModel):
+    icon: str = Field(min_length=1, max_length=120)
+    tooltip: str = Field(default="", max_length=180)
+
+
+class YamlShortcutConfig(YamlBaseModel):
+    id: str | None = Field(default=None, max_length=120)
+    page: str | None = Field(default=None, max_length=120)
+    name: str = Field(min_length=1, max_length=120)
+    url: str = Field(min_length=1, max_length=2048)
+    description: str | None = Field(default=None, max_length=240)
+    group: str = Field(default="Applications", max_length=80)
+    icon: str = Field(default="auto", max_length=2048)
+    badge: YamlBadgeConfig | None = None
+
+
+class YamlPageConfig(YamlBaseModel):
+    title: str | None = Field(default=None, max_length=120)
+    subtitle: str = Field(default="", max_length=240)
+    rubrique: str | None = Field(default=None, max_length=80)
+    accent: str | None = Field(default=None, max_length=80)
+    shortcuts: list[YamlShortcutConfig] = Field(default_factory=list)
+
+
+class YamlConfig(YamlBaseModel):
+    general: YamlGeneralConfig = Field(default_factory=YamlGeneralConfig)
+    pages: list[YamlPageConfig] | None = None
 
 
 def favicon_url(url: str) -> str:
@@ -363,10 +419,25 @@ def with_local_builtin_sources(icons: list[dict[str, str]]) -> list[dict[str, st
     return result
 
 
+def validation_detail(exc: ValidationError) -> str:
+    errors = []
+    for error in exc.errors():
+        location = ".".join(str(item) for item in error.get("loc", ())) or "root"
+        errors.append(f"{location}: {error.get('msg', 'invalid value')}")
+    return "Invalid YAML config: " + "; ".join(errors)
+
+
+def parse_yaml_config(content: dict) -> YamlConfig:
+    if not isinstance(content, dict):
+        raise HTTPException(status_code=500, detail="YAML root must be an object")
+    try:
+        return YamlConfig.model_validate(content)
+    except ValidationError as exc:
+        raise HTTPException(status_code=500, detail=validation_detail(exc)) from exc
+
+
 def should_download_builtin_icons() -> bool:
-    content = load_yaml()
-    raw_general = content.get("general") or {}
-    return bool(raw_general.get("download-icons"))
+    return parse_yaml_config(load_yaml()).general.download_icons
 
 
 def configured_builtin_icon_keys() -> set[str]:
@@ -419,7 +490,9 @@ async def warm_builtin_icon_cache() -> None:
     LOGGER.info("Builtin icon warm cache finished: %s cached", downloaded)
 
 
-def shortcut_from_yaml(item: dict, default_page_id: str) -> Shortcut:
+def shortcut_from_yaml(item: YamlShortcutConfig | dict, default_page_id: str) -> Shortcut:
+    if isinstance(item, YamlShortcutConfig):
+        item = item.model_dump()
     icon = str(item.get("icon") or "auto").strip()
     url = item.get("url", "")
     icon_type = "auto"
@@ -478,51 +551,44 @@ def load_yaml() -> dict:
 
 
 def load_page(content: dict) -> PageConfig:
-    raw_page = content.get("general") or {}
-    if raw_page and not isinstance(raw_page, dict):
-        raise HTTPException(status_code=500, detail="YAML field 'general' must be an object")
-    display_density = str(raw_page.get("display_density") or "comfortable").strip().lower()
-    if display_density not in {"comfortable", "compact"}:
-        raise HTTPException(
-            status_code=500,
-            detail="YAML field 'general.display_density' must be 'comfortable' or 'compact'",
-        )
+    raw_page = parse_yaml_config(content).general
     return PageConfig(
-        title=str(raw_page.get("title") or "Shortcuter"),
-        subtitle=str(raw_page.get("subtitle") or ""),
-        rubrique=str(raw_page.get("rubrique") or "General"),
-        accent=str(raw_page.get("accent") or "green"),
-        display_density=display_density,
-        language=str(raw_page.get("language") or "auto"),
-        logo=str(raw_page.get("logo") or "/logo.png"),
-        favicon=str(raw_page.get("favicon") or ""),
-        favicon_png=str(raw_page.get("favicon_png") or ""),
-        apple_touch_icon=str(raw_page.get("apple_touch_icon") or ""),
-        icon_192=str(raw_page.get("icon_192") or ""),
-        show_all_tab=bool(raw_page.get("show_all_tab")),
-        all_tab_accent=str(raw_page.get("all_tab_accent") or ""),
-        show_footer=raw_page.get("show_footer", True) is not False,
-        show_theme_toggle=raw_page.get("show_theme_toggle", True) is not False,
-        show_density_toggle=raw_page.get("show_density_toggle", True) is not False,
-        add_tab_name_on_duplicate_app=raw_page.get("add_tab_name_on_duplicate_app", True) is not False,
+        title=raw_page.title or "Shortcuter",
+        app_title=raw_page.app_title or raw_page.title or "Shortcuter",
+        subtitle=raw_page.subtitle or "",
+        rubrique=raw_page.rubrique or "General",
+        accent=raw_page.accent or "green",
+        display_density=raw_page.display_density,
+        language=raw_page.language or "auto",
+        logo=raw_page.logo or "/logo.png",
+        favicon=raw_page.favicon or "",
+        favicon_png=raw_page.favicon_png or "",
+        apple_touch_icon=raw_page.apple_touch_icon or "",
+        icon_192=raw_page.icon_192 or "",
+        show_all_tab=raw_page.show_all_tab,
+        all_tab_accent=raw_page.all_tab_accent or "",
+        show_footer=raw_page.show_footer,
+        show_theme_toggle=raw_page.show_theme_toggle,
+        show_density_toggle=raw_page.show_density_toggle,
+        add_tab_name_on_duplicate_app=raw_page.add_tab_name_on_duplicate_app,
     )
 
 
-def shortcut_page_from_yaml(index: int, item: dict, default_page: PageConfig) -> dict:
-    title = str(item.get("title") or f"Page {index + 1}")
+def shortcut_page_from_yaml(index: int, item: YamlPageConfig, default_page: PageConfig) -> dict:
+    title = str(item.title or f"Page {index + 1}")
     page_id = slugify(title, f"page-{index + 1}")
     return {
         "id": page_id,
         "title": title,
-        "subtitle": str(item.get("subtitle") or ""),
-        "rubrique": str(item.get("rubrique") or default_page.rubrique),
-        "accent": str(item.get("accent") or default_page.accent),
+        "subtitle": item.subtitle or "",
+        "rubrique": item.rubrique or default_page.rubrique,
+        "accent": item.accent or default_page.accent,
         "shortcuts": [],
     }
 
 
 def load_pages(content: dict, default_page: PageConfig) -> list[dict]:
-    raw_pages = content.get("pages")
+    raw_pages = parse_yaml_config(content).pages
     if raw_pages is None:
         return [
             {
@@ -534,20 +600,10 @@ def load_pages(content: dict, default_page: PageConfig) -> list[dict]:
                 "shortcuts": [],
             }
         ]
-    if not isinstance(raw_pages, list):
-        raise HTTPException(status_code=500, detail="YAML field 'pages' must be a list")
-
     pages = []
     for index, item in enumerate(raw_pages):
-        if not isinstance(item, dict):
-            raise HTTPException(status_code=500, detail=f"Page #{index + 1} is invalid")
         page = shortcut_page_from_yaml(index, item, default_page)
-        raw_shortcuts = item.get("shortcuts") or []
-        if not isinstance(raw_shortcuts, list):
-            raise HTTPException(status_code=500, detail=f"YAML field 'pages[{index}].shortcuts' must be a list")
-        for shortcut_index, shortcut_item in enumerate(raw_shortcuts):
-            if not isinstance(shortcut_item, dict):
-                raise HTTPException(status_code=500, detail=f"Shortcut #{shortcut_index + 1} on page {page['id']} is invalid")
+        for shortcut_index, shortcut_item in enumerate(item.shortcuts):
             try:
                 page["shortcuts"].append(shortcut_from_yaml(shortcut_item, page["id"]))
             except (ValueError, ValidationError) as exc:

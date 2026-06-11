@@ -5,6 +5,8 @@
 general:
   # Browser/page title shown in the header.
   title: Shortcuter
+  # Browser tab title. Defaults to "title" when omitted.
+  app_title: Shortcuter
   # Short text displayed below the main title.
   subtitle: Internal apps and services
   # Small label displayed above the main title.

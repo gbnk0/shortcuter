@@ -1,5 +1,7 @@
 # Shortcuter
 
+**The simplest dashboard to configure for self-hosted and company shortcuts.**
+
 Read-only shortcuts dashboard backed by a YAML file. It can be used as an internal company shortcuts portal for teams, departments, or shared services.
 
 The Docker image serves both the FastAPI backend and the Vue frontend.
@@ -33,6 +35,7 @@ Minimal YAML:
 ```yaml
 general:
   title: Shortcuter
+  app_title: Shortcuter
   subtitle: Internal apps and services
   rubrique: Links
   accent: green
@@ -75,6 +78,8 @@ badge:
 
 When `general.add_tab_name_on_duplicate_app` is enabled, duplicate shortcut names across tabs are displayed as `App Name (Tab Name)`.
 
+Set `general.app_title` to choose the browser tab title. It defaults to `general.title`.
+
 Set `general.display_density` to `comfortable` or `compact` to choose the default card spacing.
 
 Set `general.language` to `auto`, `en`, `fr`, `es`, or `de` to choose built-in UI labels.
@@ -95,6 +100,8 @@ pip install -r requirements.txt
 uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
+Local API development uses Python 3.13, matching the Docker image.
+
 UI:
 
 ```bash
@@ -104,6 +111,24 @@ VITE_API_URL=http://localhost:8000 npm run dev -- --host 0.0.0.0 --port 5173
 ```
 
 Open `http://localhost:5173`.
+
+## Tests
+
+API:
+
+```bash
+python3.13 -m venv api/.venv
+. api/.venv/bin/activate
+pip install -r api/requirements-dev.txt
+pytest
+```
+
+UI:
+
+```bash
+cd ui
+npm test
+```
 
 ## Acknowledgements
 

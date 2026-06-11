@@ -1,6 +1,9 @@
-const defaultApiBase = window.location.port === '5173'
-  ? `${window.location.protocol}//${window.location.hostname}:8000`
-  : window.location.origin
+const browserLocation = globalThis.window?.location
+const defaultApiBase = browserLocation
+  ? browserLocation.port === '5173'
+    ? `${browserLocation.protocol}//${browserLocation.hostname}:8000`
+    : browserLocation.origin
+  : 'http://localhost:8000'
 
 export const API_BASE = import.meta.env.VITE_API_URL || defaultApiBase
 export const APP_VERSION = import.meta.env.VITE_APP_VERSION || 'dev'
