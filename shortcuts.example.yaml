@@ -5,7 +5,7 @@
 general:
   # Browser/page title shown in the header.
   title: Shortcuter
-  # Browser tab title. Defaults to "title" when omitted.
+  # Browser tab title and appbar label. Defaults to "title" when omitted.
   app_title: Shortcuter
   # Short text displayed below the main title.
   subtitle: Internal apps and services
@@ -169,6 +169,12 @@ pages:
         description: Routes, middleware, and certificates
         icon: homarr/traefik
 
+      - name: AdGuard Home
+        url: https://dns.example.lan
+        group: DNS
+        description: DNS filtering and statistics
+        icon: homarr/adguard-home
+
       - name: GitLab
         url: https://gitlab.example.lan
         group: DevOps
@@ -197,12 +203,6 @@ pages:
         group: Firewall
         description: Rules, NAT, and interfaces
         icon: homarr/opnsense
-
-      - name: AdGuard Home
-        url: https://dns.example.lan
-        group: DNS
-        description: DNS filtering and statistics
-        icon: homarr/adguard-home
 
       - name: Pi-hole
         url: https://pihole.example.lan

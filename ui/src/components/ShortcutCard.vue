@@ -1,5 +1,12 @@
 <template>
-  <article class="shortcut-card" :style="cardStyle" @mouseenter="prepareDescriptionScroll">
+  <article
+    ref="cardRef"
+    class="shortcut-card"
+    :class="{ selected }"
+    :data-shortcut-id="shortcut.id"
+    :style="cardStyle"
+    @mouseenter="prepareDescriptionScroll"
+  >
     <a class="shortcut-link" :href="shortcut.url" target="_blank" rel="noopener noreferrer">
       <span class="shortcut-icon">
         <img v-if="shortcut.icon_type !== 'preset' && shortcut.icon_value" :src="iconUrl" alt="" @error="hideBrokenImage" />
@@ -25,7 +32,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { displayHost, iconSource } from '../utils/shortcuts'
 
 const props = defineProps({
@@ -41,8 +48,13 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  selected: {
+    type: Boolean,
+    default: false,
+  },
 })
 
+const cardRef = ref(null)
 const iconUrl = computed(() => iconSource(props.shortcut, props.builtinIcons))
 const cardStyle = computed(() => props.sourceAccent ? { '--card-accent': props.sourceAccent } : {})
 
@@ -60,4 +72,13 @@ function prepareDescriptionScroll(event) {
   description.classList.toggle('scrollable', overflow > 0)
   description.style.setProperty('--scroll-distance', overflow > 0 ? `-${overflow}px` : '0px')
 }
+
+watch(() => props.selected, async (selected) => {
+  if (!selected) {
+    return
+  }
+  await nextTick()
+  cardRef.value?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+  prepareDescriptionScroll({ currentTarget: cardRef.value })
+})
 </script>

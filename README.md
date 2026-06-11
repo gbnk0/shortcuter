@@ -78,7 +78,7 @@ badge:
 
 When `general.add_tab_name_on_duplicate_app` is enabled, duplicate shortcut names across tabs are displayed as `App Name (Tab Name)`.
 
-Set `general.app_title` to choose the browser tab title. It defaults to `general.title`.
+Set `general.app_title` to choose the browser tab title and appbar label. It defaults to `general.title`.
 
 Set `general.display_density` to `comfortable` or `compact` to choose the default card spacing.
 
@@ -87,6 +87,8 @@ Set `general.language` to `auto`, `en`, `fr`, `es`, or `de` to choose built-in U
 Set `general.logo` to a local public path or external URL for custom branding. Favicons and touch icons use that logo automatically unless you override `general.favicon`, `general.favicon_png`, `general.apple_touch_icon`, or `general.icon_192`.
 
 Set `general.show_footer`, `general.show_theme_toggle`, or `general.show_density_toggle` to `false` to hide those controls.
+
+Search supports keyboard navigation: use arrow keys to select a result and press Enter to open it.
 
 ## Local Development
 

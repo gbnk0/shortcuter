@@ -3,7 +3,7 @@
     <section class="masthead">
       <div class="appbar" :aria-label="tr('application')">
         <img class="appbar-logo" :src="branding.logo" alt="" aria-hidden="true" width="20" height="20" />
-        <span>{{ page.rubrique }}</span>
+        <span>{{ appbarTitle }}</span>
       </div>
       <div class="masthead-right">
         <SearchBar
@@ -14,6 +14,8 @@
           :placeholder="tr('searchApplications')"
           autofocus
           :focus-key="activePage"
+          @navigate="moveSearchSelection"
+          @submit="openSelectedSearchResult"
         />
         <div v-if="showDisplayControls" class="appbar-actions" :aria-label="tr('displayControls')">
           <button v-if="showThemeToggle" class="appbar-button" type="button" :title="themeTitle" @click="toggleTheme">
@@ -47,6 +49,7 @@
       :pages="pages"
       :page-shortcuts="pageShortcuts"
       :search-query="searchQuery"
+      :selected-shortcut-id="selectedSearchShortcutId"
     />
 
     <BuiltinIconsView
@@ -89,6 +92,7 @@ import { API_BASE, APP_VERSION } from './constants'
 import { resolveLocale, translate } from './i18n'
 import { applyAccent } from './utils/accent'
 import { applyBranding, brandingFromPage, DEFAULT_BRANDING } from './utils/branding'
+import { matchesShortcutSearch } from './utils/shortcuts'
 
 const appVersion = APP_VERSION
 
@@ -98,6 +102,7 @@ const loading = ref(false)
 const error = ref(null)
 const searchQuery = ref('')
 const iconSearchQuery = ref('')
+const selectedSearchIndex = ref(0)
 const branding = ref(DEFAULT_BRANDING)
 const page = ref({
   title: 'Shortcuter',
@@ -155,6 +160,7 @@ const showFooter = computed(() => page.value.show_footer !== false)
 const showThemeToggle = computed(() => page.value.show_theme_toggle !== false)
 const showDensityToggle = computed(() => page.value.show_density_toggle !== false)
 const showDisplayControls = computed(() => showThemeToggle.value || showDensityToggle.value)
+const appbarTitle = computed(() => page.value.app_title || page.value.rubrique || page.value.title || 'Shortcuter')
 
 function tr(key, params = {}) {
   return translate(locale.value, key, params)
@@ -220,6 +226,20 @@ const pageShortcuts = computed(() => {
   return shortcuts.value.filter((shortcut) => shortcut.page === activePage.value)
 })
 
+const filteredPageShortcuts = computed(() => {
+  const search = searchQuery.value.trim().toLowerCase()
+  if (!search) {
+    return pageShortcuts.value
+  }
+  return pageShortcuts.value.filter((shortcut) => matchesShortcutSearch(shortcut, search, pages.value))
+})
+const selectedSearchShortcutId = computed(() => {
+  if (!searchQuery.value.trim() || filteredPageShortcuts.value.length === 0) {
+    return ''
+  }
+  return filteredPageShortcuts.value[selectedSearchIndex.value]?.id || filteredPageShortcuts.value[0]?.id || ''
+})
+
 const pageSubtitle = computed(() => {
   if (currentPage.value.subtitle) {
     return currentPage.value.subtitle
@@ -237,6 +257,68 @@ function apiError(err) {
     title: isConfigError ? tr('configurationError') : tr('unableToLoadShortcuts'),
     message,
   }
+}
+
+function moveSearchSelection(direction) {
+  const total = filteredPageShortcuts.value.length
+  if (!searchQuery.value.trim() || total === 0) {
+    return
+  }
+  if (direction === 'up' || direction === 'down') {
+    const visualIndex = visualSearchIndex(direction)
+    if (visualIndex !== -1) {
+      selectedSearchIndex.value = visualIndex
+    }
+    return
+  }
+  const step = direction === 'left' ? -1 : 1
+  selectedSearchIndex.value = (selectedSearchIndex.value + step + total) % total
+}
+
+function visualSearchIndex(direction) {
+  const selectedShortcut = filteredPageShortcuts.value[selectedSearchIndex.value] || filteredPageShortcuts.value[0]
+  if (!selectedShortcut) {
+    return -1
+  }
+  const shortcutIndexById = new Map(filteredPageShortcuts.value.map((shortcut, index) => [shortcut.id, index]))
+  const cards = Array.from(document.querySelectorAll('.shortcut-card[data-shortcut-id]'))
+    .map((element) => {
+      const id = element.dataset.shortcutId
+      const index = shortcutIndexById.get(id)
+      if (index === undefined) {
+        return null
+      }
+      const rect = element.getBoundingClientRect()
+      return {
+        centerX: rect.left + rect.width / 2,
+        centerY: rect.top + rect.height / 2,
+        index,
+        rect,
+      }
+    })
+    .filter(Boolean)
+  const current = cards.find((card) => card.index === shortcutIndexById.get(selectedShortcut.id))
+  if (!current) {
+    return -1
+  }
+  const candidates = cards
+    .filter((card) => direction === 'down' ? card.centerY > current.centerY + 1 : card.centerY < current.centerY - 1)
+    .sort((a, b) => {
+      const rowDelta = Math.abs(a.centerY - current.centerY) - Math.abs(b.centerY - current.centerY)
+      if (Math.abs(rowDelta) > 1) {
+        return rowDelta
+      }
+      return Math.abs(a.centerX - current.centerX) - Math.abs(b.centerX - current.centerX)
+    })
+  return candidates[0]?.index ?? -1
+}
+
+function openSelectedSearchResult() {
+  if (!searchQuery.value.trim() || filteredPageShortcuts.value.length === 0) {
+    return
+  }
+  const shortcut = filteredPageShortcuts.value[selectedSearchIndex.value] || filteredPageShortcuts.value[0]
+  window.open(shortcut.url, '_blank', 'noopener,noreferrer')
 }
 
 async function loadShortcuts() {
@@ -288,6 +370,9 @@ onMounted(() => {
 
 watch(() => currentPage.value.accent, (accent) => applyAccent(accent), { immediate: true })
 watch(branding, applyBranding, { immediate: true })
+watch([searchQuery, activePage, filteredPageShortcuts], () => {
+  selectedSearchIndex.value = 0
+})
 watch(() => page.value.app_title || page.value.title, (nextTitle) => {
   document.title = nextTitle || 'Shortcuter'
 }, { immediate: true })

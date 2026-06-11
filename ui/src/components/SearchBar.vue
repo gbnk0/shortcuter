@@ -8,6 +8,11 @@
       :placeholder="placeholder"
       :autofocus="autofocus"
       @input="$emit('update:modelValue', $event.target.value.trim())"
+      @keydown.down.prevent="$emit('navigate', 'down')"
+      @keydown.enter.prevent="$emit('submit')"
+      @keydown.left.prevent="$emit('navigate', 'left')"
+      @keydown.right.prevent="$emit('navigate', 'right')"
+      @keydown.up.prevent="$emit('navigate', 'up')"
     />
     <button v-if="modelValue" class="clear-search" type="button" :title="clearTitle" @click="$emit('update:modelValue', '')">
       <i class="mdi mdi-close"></i>
@@ -41,7 +46,7 @@ const props = defineProps({
   },
 })
 
-defineEmits(['update:modelValue'])
+defineEmits(['navigate', 'submit', 'update:modelValue'])
 
 const inputRef = ref(null)
 

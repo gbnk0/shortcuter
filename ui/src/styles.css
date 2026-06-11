@@ -389,7 +389,8 @@ input {
     box-shadow 0.15s ease;
 }
 
-.shortcut-card:hover {
+.shortcut-card:hover,
+.shortcut-card.selected {
   border-color: var(--card-accent, var(--accent));
   background: color-mix(in srgb, var(--card) 94%, var(--card-accent, var(--accent)) 6%);
   box-shadow: 0 8px 22px var(--shadow);
@@ -511,7 +512,8 @@ input {
   transform: translateX(0);
 }
 
-.shortcut-card:hover .shortcut-description.scrollable span {
+.shortcut-card:hover .shortcut-description.scrollable span,
+.shortcut-card.selected .shortcut-description.scrollable span {
   animation: description-marquee 2.4s ease-in-out 0.15s infinite alternate;
 }
 
@@ -534,7 +536,8 @@ input {
 }
 
 .shortcut-card:hover .open-icon,
-.shortcut-card:focus-within .open-icon {
+.shortcut-card:focus-within .open-icon,
+.shortcut-card.selected .open-icon {
   color: var(--card-accent, var(--accent));
   opacity: 1;
 }

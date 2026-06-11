@@ -15,6 +15,7 @@
             v-for="shortcut in group.items"
             :key="shortcut.id"
             :builtin-icons="builtinIcons"
+            :selected="shortcut.id === selectedShortcutId"
             :source-accent="sourceAccent(shortcut)"
             :shortcut="shortcut"
           />
@@ -66,6 +67,10 @@ const props = defineProps({
     default: () => [],
   },
   searchQuery: {
+    type: String,
+    default: '',
+  },
+  selectedShortcutId: {
     type: String,
     default: '',
   },
