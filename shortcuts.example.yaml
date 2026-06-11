@@ -18,6 +18,9 @@ general:
   display_density: comfortable
   # UI language for built-in labels. Use "auto" to follow the browser, or force "en", "fr", "es", or "de".
   language: auto
+  # Search engine used when pressing Enter with no local search results.
+  # Use a prefix URL, or include "{query}" where the encoded query should be inserted.
+  search_engine_url: https://www.google.com/search?q=
   # Optional branding asset. Favicons and touch icons use this logo unless overridden below.
   # Use local public paths such as "/logo.png" or full external URLs.
   logo: /logo.png

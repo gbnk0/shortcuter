@@ -36,6 +36,15 @@ export function matchesShortcutSearch(shortcut, search, pages = []) {
   return normalizeSearch(search).split(/\s+/).filter(Boolean).every((term) => haystack.includes(term))
 }
 
+export function buildSearchUrl(searchEngineUrl, query) {
+  const encodedQuery = encodeURIComponent(String(query || '').trim())
+  const baseUrl = searchEngineUrl || 'https://www.google.com/search?q='
+  if (baseUrl.includes('{query}')) {
+    return baseUrl.replaceAll('{query}', encodedQuery)
+  }
+  return `${baseUrl}${encodedQuery}`
+}
+
 export function iconSource(shortcut, builtinIcons) {
   if (shortcut.icon_type === 'predefined') {
     const key = shortcut.icon_value.replace(/\.[^.]+$/, '')

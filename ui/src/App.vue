@@ -92,7 +92,7 @@ import { API_BASE, APP_VERSION } from './constants'
 import { resolveLocale, translate } from './i18n'
 import { applyAccent } from './utils/accent'
 import { applyBranding, brandingFromPage, DEFAULT_BRANDING } from './utils/branding'
-import { matchesShortcutSearch } from './utils/shortcuts'
+import { buildSearchUrl, matchesShortcutSearch } from './utils/shortcuts'
 
 const appVersion = APP_VERSION
 
@@ -112,6 +112,7 @@ const page = ref({
   accent: 'green',
   display_density: 'comfortable',
   language: 'auto',
+  search_engine_url: 'https://www.google.com/search?q=',
   logo: DEFAULT_BRANDING.logo,
   favicon: '',
   favicon_png: '',
@@ -314,7 +315,12 @@ function visualSearchIndex(direction) {
 }
 
 function openSelectedSearchResult() {
-  if (!searchQuery.value.trim() || filteredPageShortcuts.value.length === 0) {
+  const query = searchQuery.value.trim()
+  if (!query) {
+    return
+  }
+  if (filteredPageShortcuts.value.length === 0) {
+    window.open(buildSearchUrl(page.value.search_engine_url, query), '_blank', 'noopener,noreferrer')
     return
   }
   const shortcut = filteredPageShortcuts.value[selectedSearchIndex.value] || filteredPageShortcuts.value[0]

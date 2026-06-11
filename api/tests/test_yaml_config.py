@@ -11,6 +11,7 @@ def test_general_options_are_parsed():
             "app_title": "Company Links",
             "display_density": "compact",
             "language": "fr",
+            "search_engine_url": "https://search.example.test/?q=",
             "logo": "brand.png",
             "show_footer": False,
             "show_theme_toggle": False,
@@ -24,6 +25,7 @@ def test_general_options_are_parsed():
     assert page.app_title == "Company Links"
     assert page.display_density == "compact"
     assert page.language == "fr"
+    assert page.search_engine_url == "https://search.example.test/?q="
     assert page.logo == "brand.png"
     assert page.favicon == ""
     assert page.show_footer is False

@@ -41,6 +41,7 @@ general:
   accent: green
   display_density: comfortable
   language: auto
+  search_engine_url: https://www.google.com/search?q=
   logo: /logo.png
   show_all_tab: true
   show_footer: true
@@ -84,11 +85,13 @@ Set `general.display_density` to `comfortable` or `compact` to choose the defaul
 
 Set `general.language` to `auto`, `en`, `fr`, `es`, or `de` to choose built-in UI labels.
 
+Set `general.search_engine_url` to choose the search engine used when Enter is pressed with no local results. Use a prefix URL such as `https://www.google.com/search?q=` or a `{query}` placeholder.
+
 Set `general.logo` to a local public path or external URL for custom branding. Favicons and touch icons use that logo automatically unless you override `general.favicon`, `general.favicon_png`, `general.apple_touch_icon`, or `general.icon_192`.
 
 Set `general.show_footer`, `general.show_theme_toggle`, or `general.show_density_toggle` to `false` to hide those controls.
 
-Search supports keyboard navigation: use arrow keys to select a result and press Enter to open it.
+Search supports keyboard navigation: use arrow keys to select a result and press Enter to open it. If there are no local results, Enter opens the configured search engine.
 
 ## Local Development
 

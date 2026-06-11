@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { groupShortcuts, iconSource, matchesShortcutSearch } from './shortcuts'
+import { buildSearchUrl, groupShortcuts, iconSource, matchesShortcutSearch } from './shortcuts'
 
 describe('shortcut utilities', () => {
   const pages = [{ id: 'ops', title: 'Operations', rubrique: 'Infra' }]
@@ -26,5 +26,14 @@ describe('shortcut utilities', () => {
 
   it('resolves Homarr predefined icon URLs when not cached locally', () => {
     expect(iconSource({ icon_type: 'predefined', icon_value: 'homarr/grafana' }, [])).toContain('/grafana.svg')
+  })
+
+  it('builds external search URLs from prefixes and placeholders', () => {
+    expect(buildSearchUrl('https://www.google.com/search?q=', 'hello world')).toBe(
+      'https://www.google.com/search?q=hello%20world',
+    )
+    expect(buildSearchUrl('https://search.example.test/?term={query}', 'grafana ops')).toBe(
+      'https://search.example.test/?term=grafana%20ops',
+    )
   })
 })

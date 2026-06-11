@@ -113,6 +113,7 @@ class PageConfig(BaseModel):
     accent: str = "green"
     display_density: Literal["comfortable", "compact"] = "comfortable"
     language: str = Field(default="auto", max_length=16)
+    search_engine_url: str = Field(default="https://www.google.com/search?q=", max_length=2048)
     logo: str = Field(default="/logo.png", max_length=2048)
     favicon: str = Field(default="", max_length=2048)
     favicon_png: str = Field(default="", max_length=2048)
@@ -152,6 +153,7 @@ class YamlGeneralConfig(YamlBaseModel):
     accent: str = "green"
     display_density: Literal["comfortable", "compact"] = "comfortable"
     language: str = Field(default="auto", max_length=16)
+    search_engine_url: str = Field(default="https://www.google.com/search?q=", max_length=2048)
     logo: str = Field(default="/logo.png", max_length=2048)
     favicon: str = Field(default="", max_length=2048)
     favicon_png: str = Field(default="", max_length=2048)
@@ -560,6 +562,7 @@ def load_page(content: dict) -> PageConfig:
         accent=raw_page.accent or "green",
         display_density=raw_page.display_density,
         language=raw_page.language or "auto",
+        search_engine_url=raw_page.search_engine_url or "https://www.google.com/search?q=",
         logo=raw_page.logo or "/logo.png",
         favicon=raw_page.favicon or "",
         favicon_png=raw_page.favicon_png or "",
