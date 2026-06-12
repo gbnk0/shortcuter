@@ -14,6 +14,7 @@
           :placeholder="tr('searchApplications')"
           autofocus
           :focus-key="activePage"
+          @focus-change="searchFocused = $event"
           @navigate="moveSearchSelection"
           @submit="openSelectedSearchResult"
         />
@@ -101,8 +102,10 @@ const builtinIcons = ref([])
 const loading = ref(false)
 const error = ref(null)
 const searchQuery = ref('')
+const searchFocused = ref(false)
 const iconSearchQuery = ref('')
 const selectedSearchIndex = ref(0)
+const keyboardNavigationActive = ref(false)
 const branding = ref(DEFAULT_BRANDING)
 const page = ref({
   title: 'Shortcuter',
@@ -169,7 +172,7 @@ function tr(key, params = {}) {
 
 const shortcutLabels = computed(() => ({
   loading: tr('loading'),
-  noResults: tr('noResults'),
+  noResults: tr(searchFocused.value ? 'noResultsExternalSearch' : 'noResults'),
   noShortcuts: tr('noShortcuts'),
 }))
 
@@ -235,7 +238,7 @@ const filteredPageShortcuts = computed(() => {
   return pageShortcuts.value.filter((shortcut) => matchesShortcutSearch(shortcut, search, pages.value))
 })
 const selectedSearchShortcutId = computed(() => {
-  if (!searchQuery.value.trim() || filteredPageShortcuts.value.length === 0) {
+  if ((!searchQuery.value.trim() && !keyboardNavigationActive.value) || filteredPageShortcuts.value.length === 0) {
     return ''
   }
   return filteredPageShortcuts.value[selectedSearchIndex.value]?.id || filteredPageShortcuts.value[0]?.id || ''
@@ -262,9 +265,15 @@ function apiError(err) {
 
 function moveSearchSelection(direction) {
   const total = filteredPageShortcuts.value.length
-  if (!searchQuery.value.trim() || total === 0) {
+  if (total === 0) {
     return
   }
+  if (!keyboardNavigationActive.value && !searchQuery.value.trim()) {
+    keyboardNavigationActive.value = true
+    selectedSearchIndex.value = 0
+    return
+  }
+  keyboardNavigationActive.value = true
   if (direction === 'up' || direction === 'down') {
     const visualIndex = visualSearchIndex(direction)
     if (visualIndex !== -1) {
@@ -316,11 +325,14 @@ function visualSearchIndex(direction) {
 
 function openSelectedSearchResult() {
   const query = searchQuery.value.trim()
-  if (!query) {
+  if (!query && !keyboardNavigationActive.value) {
+    return
+  }
+  if (query && filteredPageShortcuts.value.length === 0) {
+    window.open(buildSearchUrl(page.value.search_engine_url, query), '_blank', 'noopener,noreferrer')
     return
   }
   if (filteredPageShortcuts.value.length === 0) {
-    window.open(buildSearchUrl(page.value.search_engine_url, query), '_blank', 'noopener,noreferrer')
     return
   }
   const shortcut = filteredPageShortcuts.value[selectedSearchIndex.value] || filteredPageShortcuts.value[0]
@@ -378,6 +390,7 @@ watch(() => currentPage.value.accent, (accent) => applyAccent(accent), { immedia
 watch(branding, applyBranding, { immediate: true })
 watch([searchQuery, activePage, filteredPageShortcuts], () => {
   selectedSearchIndex.value = 0
+  keyboardNavigationActive.value = Boolean(searchQuery.value.trim())
 })
 watch(() => page.value.app_title || page.value.title, (nextTitle) => {
   document.title = nextTitle || 'Shortcuter'

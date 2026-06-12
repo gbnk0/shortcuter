@@ -7,6 +7,8 @@
       type="search"
       :placeholder="placeholder"
       :autofocus="autofocus"
+      @blur="$emit('focus-change', false)"
+      @focus="$emit('focus-change', true)"
       @input="$emit('update:modelValue', $event.target.value.trim())"
       @keydown.down.prevent="$emit('navigate', 'down')"
       @keydown.enter.prevent="$emit('submit')"
@@ -46,7 +48,7 @@ const props = defineProps({
   },
 })
 
-defineEmits(['navigate', 'submit', 'update:modelValue'])
+defineEmits(['focus-change', 'navigate', 'submit', 'update:modelValue'])
 
 const inputRef = ref(null)
 

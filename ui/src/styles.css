@@ -332,8 +332,8 @@ input {
 }
 
 .clear-search:hover {
-  background: var(--card-muted);
-  color: var(--text);
+  background: var(--danger-bg);
+  color: var(--danger-text);
 }
 
 .search-band > .mdi {
@@ -431,12 +431,12 @@ input {
 .tab-panel.compact .shortcut-icon {
   width: 36px;
   height: 36px;
-  font-size: 1.35rem;
+  font-size: 1.65rem;
 }
 
 .tab-panel.compact .shortcut-icon img {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
 }
 
 .tab-panel.compact .shortcut-text strong {
@@ -454,15 +454,13 @@ input {
   justify-content: center;
   width: 48px;
   height: 48px;
-  border-radius: 8px;
-  background: var(--card-muted);
   color: var(--accent);
-  font-size: 1.75rem;
+  font-size: 2.15rem;
 }
 
 .shortcut-icon img {
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
 }
 
